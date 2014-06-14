@@ -1,0 +1,38 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+    <interface name="org.ofono.Settings">
+        <method name="GetAll">
+            <arg name="settings" type="a(sa{ss})" direction="out"/>
+            <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="OfonoGroupedSettings"/>
+        </method>
+        <method name="GetGroup">
+            <arg name="group" type="s" direction="in"/>
+            <arg name="settings" type="a{ss}" direction="out"/>
+            <annotation name="org.qtproject.QtDBus.QtTypeName.Out0" value="OfonoArrayOfSettings"/>
+        </method>
+        <method name="Get">
+            <arg name="group" type="s" direction="in"/>
+            <arg name="key" type="s" direction="in"/>
+            <arg name="value" type="s" direction="out"/>
+        </method>
+        <method name="Set">
+            <arg name="group" type="s" direction="in"/>
+            <arg name="key" type="s" direction="in"/>
+            <arg name="value" type="s" direction="in"/>
+        </method>
+        <method name="ResetAll"/>
+        <method name="ResetGroup">
+            <arg name="group" type="s" direction="in"/>
+        </method>
+        <method name="Reset">
+            <arg name="group" type="s" direction="in"/>
+            <arg name="key" type="s" direction="in"/>
+        </method>
+        <signal name="Changed">
+            <arg name="group" type="s"/>
+            <arg name="key" type="s"/>
+            <arg name="value" type="s"/>
+        </signal>
+    </interface>
+</node>
