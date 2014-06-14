@@ -93,15 +93,20 @@ Page {
     }
 
     Component.onCompleted: {
-        userAgentEditor.value = settings.userAgent
-        userAgentProfileEditor.value = settings.userAgentProfile
-        maxMessageSizeEditor.value = settings.maxMessageSize
-        maxPixelsEditor.value = settings.maxPixels
-
-        // Settings validators at construction doesn't do the right thing
-        // (value gets marked as invalid even though it's perfectly valid)
-        maxMessageSizeEditor.validator = intValidator
-        maxPixelsEditor.validator = intValidator
+        if (settings.userAgent !== undefined) {
+            userAgentEditor.value = settings.userAgent
+        }
+        if (settings.userAgentProfile !== undefined) {
+            userAgentProfileEditor.value = settings.userAgentProfile
+        }
+        if (settings.maxMessageSize !== undefined) {
+            maxMessageSizeEditor.value = settings.maxMessageSize
+            maxMessageSizeEditor.validator = intValidator
+        }
+        if (settings.maxPixels !== undefined) {
+            maxPixelsEditor.value = settings.maxPixels
+            maxPixelsEditor.validator = intValidator
+        }
     }
 
     SilicaFlickable {
@@ -146,6 +151,7 @@ Page {
 
             ValueEditor {
                 id: userAgentEditor
+                visible: settings.userAgent !== undefined
                 predefined: userAgentOptions
                 name: "userAgent"
                 label: qsTr("User-Agent:")
@@ -154,6 +160,7 @@ Page {
 
             ValueEditor {
                 id: userAgentProfileEditor
+                visible: settings.userAgentProfile !== undefined
                 predefined: userAgentProfileOptions
                 name: "userAgentProfile"
                 label: qsTr("User Agent profile:")
@@ -162,6 +169,7 @@ Page {
 
             ValueEditor {
                 id: maxMessageSizeEditor
+                visible: settings.maxMessageSize !== undefined
                 predefined: maxMessageSizeOptions
                 name: "maxMessageSize"
                 label: qsTr("Maximum message size:")
@@ -183,6 +191,7 @@ Page {
 
             ValueEditor {
                 id: maxPixelsEditor
+                visible: settings.maxPixels !== undefined
                 predefined: maxPixelsOptions
                 name: "maxPixels"
                 label: qsTr("Maximum image size:")

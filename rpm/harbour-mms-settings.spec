@@ -5,7 +5,7 @@
 
 Name:       harbour-mms-settings
 Summary:    Advanced MMS settings
-Version:    1.0
+Version:    1.0.1
 Release:    1
 Group:      Qt/Qt
 License:    GPLv3
@@ -45,3 +45,7 @@ desktop-file-install --delete-original \
 %{_datadir}/%{name}
 %{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/86x86/apps/%{name}.png
+
+%changelog
+* Fri Jun 13 2014 Slava Monich <slava.monich@jolla.com> 1.0.0
+- Initial version
