@@ -2,6 +2,6 @@ Advanced MMS settings for Sailfish
 ==================================
 
 1. User-Agent header
-2. User Agent Profile URL
+2. User Agent Profile URL (requires SailfishOS 1.0.8)
 3. Maximum message size, bytes
 4. Maximum image size, pixels
