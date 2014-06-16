@@ -159,20 +159,22 @@ Column {
     function updateSelection() {
         var n = predefined ? predefined.length/2 : 0
         if (n > 0) {
-            var i
-            updatingIndex = true
-            for (i = 0; i < n; i++) {
+            for (var i = 0; i < n; i++) {
                 if (root.value == predefined[2*i+1]) {
+                    updatingIndex = true
                     comboBox.currentIndex = i
                     updatingIndex = false
                     return
                 }
             }
+
+            updatingText = true
+            customText.text = root.value ? root.value : ""
+            updatingText = false
+
+            updatingIndex = true
             comboBox.currentIndex = n
             updatingIndex = false
         }
-        updatingText = true
-        customText.text = root.value ? root.value : ""
-        updatingText = false
     }
 }
