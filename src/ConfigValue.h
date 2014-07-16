@@ -28,54 +28,64 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <QtGui>
-#include <QtQuick>
-#include <sailfishapp.h>
+#ifndef CONFIGVALUE_H
+#define CONFIGVALUE_H
 
-#include "ConfigDebug.h"
-#include "ConfigValue.h"
-#include "MmsEngine.h"
-#include "qofono/qofonomanager.h"
-#include "qofono/qofonosimmanager.h"
+#include <QObject>
+#include <QString>
+#include <QVariant>
 
-#define PLUGIN_PREFIX "harbour.mms.settings"
+class MGConfItem;
+class MmsEngine;
 
-void registerOfonoTypes(const char* uri, int v1 = 1, int v2 = 0)
+class ConfigValue: public QObject
 {
-    qmlRegisterType<QOfonoManager>(uri, v1, v2, "OfonoManager");
-    qmlRegisterType<QOfonoSimManager>(uri, v1, v2, "OfonoSimManager");
-}
+    Q_OBJECT
+    Q_PROPERTY(QString key READ key WRITE setKey NOTIFY keyChanged)
+    Q_PROPERTY(QString imsi READ imsi WRITE setImsi NOTIFY imsiChanged)
+    Q_PROPERTY(QVariant value READ value WRITE setValue NOTIFY valueChanged)
+    Q_PROPERTY(QVariant defaultValue READ defaultValue NOTIFY defaultValueChanged)
+    Q_PROPERTY(MmsEngine* engine READ engine WRITE setEngine NOTIFY engineChanged)
 
-void registerConfigTypes(const char* uri, int v1 = 1, int v2 = 0)
-{
-    qmlRegisterType<ConfigValue>(uri, v1, v2, "ConfigValue");
-    qmlRegisterType<MmsEngine>(uri, v1, v2, "MmsEngine");
-}
+public:
+    ConfigValue(QObject* aParent = NULL);
 
-int main(int argc, char *argv[])
-{
-    int result = 0;
-    QGuiApplication* app = SailfishApp::application(argc, argv);
+    QString key() const;
+    void setKey(QString aKey);
 
-    QTranslator* translator = new QTranslator(app);
-    QString transDir = SailfishApp::pathTo("translations").toLocalFile();
-    if (translator->load(QLocale(), "harbour-mms-settings", "-", transDir)) {
-        app->installTranslator(translator);
-    } else {
-        QDEBUG("Failed to load translator for" << QLocale());
-        delete translator;
-    }
+    QString imsi() const;
+    void setImsi(QString aImsi);
 
-    registerOfonoTypes(PLUGIN_PREFIX ".qofono");
-    registerConfigTypes(PLUGIN_PREFIX ".config");
+    QVariant value() const;
+    void setValue(QVariant aValue);
 
-    QQuickView *view = SailfishApp::createView();
-    view->setSource(SailfishApp::pathTo(QString("qml/main.qml")));
-    view->show();
+    QVariant defaultValue() const;
 
-    result = app->exec();
+    MmsEngine* engine() const;
+    void setEngine(MmsEngine* aEngine);
 
-    delete view;
-    delete app;
-    return result;
-}
+public slots:
+    void onEngineAvailableChanged();
+    void onValueChanged();
+
+signals:
+    void keyChanged();
+    void imsiChanged();
+    void valueChanged();
+    void defaultValueChanged();
+    void engineChanged();
+
+private:
+    void updateMGConfItem();
+    void updateDefaultValue();
+    QString dconfPath();
+
+private:
+    MGConfItem* iItem;
+    MmsEngine* iEngine;
+    QString iKey;
+    QString iImsi;
+    QVariant iDefaultValue;
+};
+
+#endif // CONFIGVALUE_H

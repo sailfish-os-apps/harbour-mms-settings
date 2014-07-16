@@ -1,17 +1,22 @@
 TARGET = harbour-mms-settings
 
-QT += dbus
+QT += dbus xml
 CONFIG += link_pkgconfig
 CONFIG += sailfishapp
-PKGCONFIG += glib-2.0 gio-2.0
+PKGCONFIG += mlite5
 QMAKE_CXXFLAGS += -Wno-unused-parameter
 
 SOURCES += \
-    src/main.cpp
+    src/main.cpp \
+    src/ConfigValue.cpp \
+    src/MmsEngine.cpp
+
+HEADERS += \
+    src/MmsEngine.h \
+    src/ConfigDebug.h \
+    src/ConfigValue.h
 
 INCLUDEPATH += \
-    gsettings-qt \
-    gsettings-qt/src \
     qofono
 
 OTHER_FILES += \
@@ -23,25 +28,6 @@ OTHER_FILES += \
     rpm/harbour-mms-settings.spec \
     translations/*.ts \
     harbour-mms-settings.desktop
-
-# gsettings-qt
-SOURCES += \
-    gsettings-qt/src/qconftypes.cpp \
-    gsettings-qt/src/qgsettings.cpp \
-    gsettings-qt/src/util.cpp
-
-HEADERS += \
-    gsettings-qt/src/qconftypes.h \
-    gsettings-qt/src/qgsettings.h \
-    gsettings-qt/src/util.h
-
-SOURCES += \
-    gsettings-qt/GSettings/gsettings-qml.cpp \
-    gsettings-qt/GSettings/plugin.cpp
-
-HEADERS += \
-    gsettings-qt/GSettings/gsettings-qml.h \
-    gsettings-qt/GSettings/plugin.h
 
 # qofono
 SOURCES += \

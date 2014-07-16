@@ -20,10 +20,6 @@
         <translation>Очень большой</translation>
     </message>
     <message>
-        <source>MMS Settings</source>
-        <translation>Настройки ММС</translation>
-    </message>
-    <message>
         <source>User-Agent:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -34,10 +30,6 @@
     <message>
         <source>Maximum message size:</source>
         <translation>Макс. размер сообщения:</translation>
-    </message>
-    <message>
-        <source>Maximum message size (bytes)</source>
-        <translation>Размер (в байтах)</translation>
     </message>
     <message>
         <source>%1 MB</source>
@@ -60,12 +52,24 @@
         <translation>%1 пикселей</translation>
     </message>
     <message>
+        <source>Maximum size (bytes)</source>
+        <translation>Размер (в байтах)</translation>
+    </message>
+    <message>
         <source>Maximum image size:</source>
         <translation>Макс. размер картинки:</translation>
     </message>
     <message>
         <source>Maximum size (pixels)</source>
         <translation>Размер (в пикселях)</translation>
+    </message>
+    <message>
+        <source>MMS Settings</source>
+        <translation>Настройки ММС</translation>
+    </message>
+    <message>
+        <source>Please wait</source>
+        <translation>Секундочку</translation>
     </message>
 </context>
 <context>

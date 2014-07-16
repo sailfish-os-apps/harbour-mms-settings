@@ -30,21 +30,24 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.mms.settings.config 1.0
 
 Column {
     id: root
     width: parent.width
 
     property var predefined: []
-    property var value
-    property string name
     property string customMenuText
     property string customPlaceholder
+    property alias imsi: configValue.imsi
+    property alias key: configValue.key
+    property alias engine: configValue.engine
     property alias label: comboBox.label
     property alias validator: customText.validator
     property alias placeholderText: customText.placeholderText
     property alias inputMethodHints: customText.inputMethodHints
     property var formatter
+    visible: configValue.defaultValue !== undefined
 
     // Internal properties
     property bool updatingValue: false
@@ -52,7 +55,13 @@ Column {
     property bool updatingText: false
 
     onPredefinedChanged: resetMenu()
-    onValueChanged: if (!updatingValue) updateSelection()
+
+    Component.onCompleted: updateSelection()
+
+    ConfigValue {
+        id: configValue
+        onValueChanged: if (!updatingValue) updateSelection()
+    }
 
     ComboBox {
         id: comboBox
@@ -62,18 +71,18 @@ Column {
             var wasUpdatingValue = updatingValue
             updatingValue = true
             if (currentIndex === predefined.length/2) {
-                root.value = customText.text
+                configValue.value = customText.text
                 if (!updatingIndex) customText.focus = true
             } else {
-                root.value = predefined[2*currentIndex + 1]
+                configValue.value = predefined[2*currentIndex + 1]
             }
             updatingValue = wasUpdatingValue
         }
     }
 
     MouseArea {
-        id: value
-        property bool menuOpen: menu.parent === value
+        id: mouseArea
+        property bool menuOpen: menu.parent === mouseArea
         property bool canCopy: customText.validator ? false : true
         visible: comboBox.currentIndex < predefined.length/2
         height: menuOpen ? (menu.height + label.height) : label.height
@@ -102,7 +111,7 @@ Column {
                 onClicked: Clipboard.text = label.text
             }
         }
-        onPressAndHold: if (canCopy) menu.show(value)
+        onPressAndHold: if (canCopy) menu.show(mouseArea)
     }
 
     TextField {
@@ -116,7 +125,7 @@ Column {
             if (!updatingText) {
                 var wasUpdatingValue = updatingValue
                 updatingValue = true
-                root.value = text
+                configValue.value = text
                 updatingValue = wasUpdatingValue
             }
         }
@@ -144,7 +153,7 @@ Column {
                 var name = predefined[2*i]
                 var predefinedValue = predefined[2*i+1]
                 menuItemComponent.createObject(menu._contentColumn, {"text": name } )
-                if (predefinedValue == root.value) {
+                if (predefinedValue == configValue.value) {
                     comboBox.currentIndex = i
                     foundValue = true
                 }
@@ -160,7 +169,7 @@ Column {
         var n = predefined ? predefined.length/2 : 0
         if (n > 0) {
             for (var i = 0; i < n; i++) {
-                if (root.value == predefined[2*i+1]) {
+                if (configValue.value == predefined[2*i+1]) {
                     updatingIndex = true
                     comboBox.currentIndex = i
                     updatingIndex = false
@@ -169,7 +178,7 @@ Column {
             }
 
             updatingText = true
-            customText.text = root.value ? root.value : ""
+            customText.text = configValue.value ? configValue.value : ""
             updatingText = false
 
             updatingIndex = true

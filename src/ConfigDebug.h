@@ -28,54 +28,18 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <QtGui>
-#include <QtQuick>
-#include <sailfishapp.h>
+#ifndef CONFIGDEBUG_H
+#define CONFIGDEBUG_H
 
-#include "ConfigDebug.h"
-#include "ConfigValue.h"
-#include "MmsEngine.h"
-#include "qofono/qofonomanager.h"
-#include "qofono/qofonosimmanager.h"
+#ifndef QT_NO_DEBUG
+#  include <QDebug>
+#  define QDEBUG(x) qDebug() << x
+#  define QASSERT(x) ((x) ? ((void)0) : qt_assert(#x,__FILE__,__LINE__))
+#  define QVERIFY(x) QASSERT(x)
+#else
+#  define QDEBUG(expr) ((void)0)
+#  define QASSERT(expr) ((void)0)
+#  define QVERIFY(x) (x)
+#endif
 
-#define PLUGIN_PREFIX "harbour.mms.settings"
-
-void registerOfonoTypes(const char* uri, int v1 = 1, int v2 = 0)
-{
-    qmlRegisterType<QOfonoManager>(uri, v1, v2, "OfonoManager");
-    qmlRegisterType<QOfonoSimManager>(uri, v1, v2, "OfonoSimManager");
-}
-
-void registerConfigTypes(const char* uri, int v1 = 1, int v2 = 0)
-{
-    qmlRegisterType<ConfigValue>(uri, v1, v2, "ConfigValue");
-    qmlRegisterType<MmsEngine>(uri, v1, v2, "MmsEngine");
-}
-
-int main(int argc, char *argv[])
-{
-    int result = 0;
-    QGuiApplication* app = SailfishApp::application(argc, argv);
-
-    QTranslator* translator = new QTranslator(app);
-    QString transDir = SailfishApp::pathTo("translations").toLocalFile();
-    if (translator->load(QLocale(), "harbour-mms-settings", "-", transDir)) {
-        app->installTranslator(translator);
-    } else {
-        QDEBUG("Failed to load translator for" << QLocale());
-        delete translator;
-    }
-
-    registerOfonoTypes(PLUGIN_PREFIX ".qofono");
-    registerConfigTypes(PLUGIN_PREFIX ".config");
-
-    QQuickView *view = SailfishApp::createView();
-    view->setSource(SailfishApp::pathTo(QString("qml/main.qml")));
-    view->show();
-
-    result = app->exec();
-
-    delete view;
-    delete app;
-    return result;
-}
+#endif // CONFIGDEBUG_H

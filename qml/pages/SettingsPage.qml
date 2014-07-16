@@ -31,7 +31,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.mms.settings.qofono 1.0
-import harbour.mms.settings.gsettings 1.0
+import harbour.mms.settings.config 1.0
 
 Page {
     id: page
@@ -67,51 +67,23 @@ Page {
 
     property string ofonoModem: ofonoManager.modems[0]
     property bool simAvailable: simManager.present && simManager.subscriberIdentity
+    property bool startAnimationPlaying: startTimer.running || !mmsEngine.available
 
     OfonoManager { id: ofonoManager }
 
     OfonoSimManager {
         id: simManager
         modemPath: ofonoModem
+        onSubscriberIdentityChanged: if (subscriberIdentity) mmsEngine.migrateSettings(subscriberIdentity)
     }
 
-    GSettings {
-        id: settings
-        schema.path: simAvailable ? ("/" + simManager.subscriberIdentity + "/") : ""
-        schema.id: "org.nemomobile.mms.sim"
-        onChanged: {
-            if (key == userAgentProfileEditor.name) {
-                userAgentProfileEditor.value = value
-            } else if (key == userAgentEditor.name) {
-                userAgentEditor.value = value
-            } else if (key == maxMessageSizeEditor.name) {
-                maxMessageSizeEditor.value = value
-            } else if (key == maxPixelsEditor.name) {
-                maxPixelsEditor.value = value
-            }
-        }
-    }
-
-    Component.onCompleted: {
-        if (settings.userAgent !== undefined) {
-            userAgentEditor.value = settings.userAgent
-        }
-        if (settings.userAgentProfile !== undefined) {
-            userAgentProfileEditor.value = settings.userAgentProfile
-        }
-        if (settings.maxMessageSize !== undefined) {
-            maxMessageSizeEditor.value = settings.maxMessageSize
-            maxMessageSizeEditor.validator = intValidator
-        }
-        if (settings.maxPixels !== undefined) {
-            maxPixelsEditor.value = settings.maxPixels
-            maxPixelsEditor.validator = intValidator
-        }
+    MmsEngine {
+        id: mmsEngine
     }
 
     SilicaFlickable {
         anchors.fill: parent
-        contentHeight: content.height
+        contentHeight: startAnimationPlaying ? splashScreen.height : content.height
 
         VerticalScrollDecorator { }
 
@@ -141,7 +113,35 @@ Page {
         }
 
         Column {
+            id: splashScreen
+            visible: startAnimationPlaying
+            x: (page.width - childrenRect.width)/2
+            y: (page.height - busyIndicator.height)/2 - pleaseWait.height - spacing
+            spacing: Theme.paddingLarge
+            Text {
+                id: pleaseWait
+                anchors.horizontalCenter: parent.horizontalCenter
+                horizontalAlignment: Text.AlignHCenter
+                wrapMode: Text.Wrap
+                font {
+                    pixelSize: Theme.fontSizeExtraLarge
+                    family: Theme.fontFamilyHeading
+                }
+                color: Theme.highlightColor
+                opacity: 0.6
+                text: qsTr("Please wait")
+            }
+            BusyIndicator {
+                id: busyIndicator
+                anchors.horizontalCenter: parent.horizontalCenter
+                size: BusyIndicatorSize.Large
+                running: parent.visible
+            }
+        }
+
+        Column {
             id: content
+            visible: !startAnimationPlaying
             enabled: placeholder.state === ""
             opacity: enabled ? 1 : 0
             width: parent.width
@@ -150,28 +150,26 @@ Page {
             PageHeader { title: qsTr("MMS Settings") }
 
             ValueEditor {
-                id: userAgentEditor
-                visible: settings.userAgent !== undefined
                 predefined: userAgentOptions
-                name: "userAgent"
+                imsi: simManager.subscriberIdentity
+                engine: mmsEngine
+                key: "user-agent"
                 label: qsTr("User-Agent:")
-                onValueChanged: settings.userAgent = value
             }
 
             ValueEditor {
-                id: userAgentProfileEditor
-                visible: settings.userAgentProfile !== undefined
                 predefined: userAgentProfileOptions
-                name: "userAgentProfile"
+                imsi: simManager.subscriberIdentity
+                engine: mmsEngine
+                key: "user-agent-profile"
                 label: qsTr("User Agent profile:")
-                onValueChanged: settings.userAgentProfile = value
             }
 
             ValueEditor {
-                id: maxMessageSizeEditor
-                visible: settings.maxMessageSize !== undefined
                 predefined: maxMessageSizeOptions
-                name: "maxMessageSize"
+                imsi: simManager.subscriberIdentity
+                engine: mmsEngine
+                key: "max-message-size"
                 label: qsTr("Maximum message size:")
                 placeholderText: qsTr("Maximum size (bytes)")
                 inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhDigitsOnly
@@ -186,14 +184,13 @@ Page {
                         }
                     }
                 }
-                onValueChanged: settings.maxMessageSize = value
             }
 
             ValueEditor {
-                id: maxPixelsEditor
-                visible: settings.maxPixels !== undefined
                 predefined: maxPixelsOptions
-                name: "maxPixels"
+                imsi: simManager.subscriberIdentity
+                engine: mmsEngine
+                key: "max-pixels"
                 label: qsTr("Maximum image size:")
                 placeholderText: qsTr("Maximum size (pixels)")
                 inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhDigitsOnly
@@ -202,7 +199,6 @@ Page {
                         return qsTr("%1 pixels").arg(size);
                     }
                 }
-                onValueChanged: settings.maxPixels = value
             }
         }
     }
@@ -211,5 +207,12 @@ Page {
         id: intValidator
         bottom: 0
         top: 2147483647
+    }
+
+    Timer {
+        id: startTimer
+        running: true
+        repeat: false
+        interval: 1000
     }
 }

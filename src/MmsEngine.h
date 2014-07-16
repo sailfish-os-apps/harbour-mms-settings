@@ -28,54 +28,46 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <QtGui>
-#include <QtQuick>
-#include <sailfishapp.h>
+#ifndef MMSENGINE_H
+#define MMSENGINE_H
 
-#include "ConfigDebug.h"
-#include "ConfigValue.h"
-#include "MmsEngine.h"
-#include "qofono/qofonomanager.h"
-#include "qofono/qofonosimmanager.h"
+#include <QObject>
+#include <QDBusPendingCall>
 
-#define PLUGIN_PREFIX "harbour.mms.settings"
+class QDBusPendingCallWatcher;
 
-void registerOfonoTypes(const char* uri, int v1 = 1, int v2 = 0)
+class MmsEngine: public QObject
 {
-    qmlRegisterType<QOfonoManager>(uri, v1, v2, "OfonoManager");
-    qmlRegisterType<QOfonoSimManager>(uri, v1, v2, "OfonoSimManager");
-}
+    Q_OBJECT
+    Q_PROPERTY(QString version READ version NOTIFY versionChanged)
+    Q_PROPERTY(bool available READ available NOTIFY availableChanged)
 
-void registerConfigTypes(const char* uri, int v1 = 1, int v2 = 0)
-{
-    qmlRegisterType<ConfigValue>(uri, v1, v2, "ConfigValue");
-    qmlRegisterType<MmsEngine>(uri, v1, v2, "MmsEngine");
-}
+public:
+    MmsEngine(QObject* aParent = NULL);
 
-int main(int argc, char *argv[])
-{
-    int result = 0;
-    QGuiApplication* app = SailfishApp::application(argc, argv);
+    QString version() const;
+    bool available() const;
+    bool laterThan(int aMajor, int aMinor, int aMicro) const;
 
-    QTranslator* translator = new QTranslator(app);
-    QString transDir = SailfishApp::pathTo("translations").toLocalFile();
-    if (translator->load(QLocale(), "harbour-mms-settings", "-", transDir)) {
-        app->installTranslator(translator);
-    } else {
-        QDEBUG("Failed to load translator for" << QLocale());
-        delete translator;
-    }
+    Q_INVOKABLE void migrateSettings(QString aImsi);
 
-    registerOfonoTypes(PLUGIN_PREFIX ".qofono");
-    registerConfigTypes(PLUGIN_PREFIX ".config");
+private:
+    QDBusPendingCall call(QString aMethod, QVariant aArg = QVariant());
+    void call(const char* aSlot, QString aMethod, QVariant aArg = QVariant());
 
-    QQuickView *view = SailfishApp::createView();
-    view->setSource(SailfishApp::pathTo(QString("qml/main.qml")));
-    view->show();
+signals:
+    void versionChanged();
+    void availableChanged();
 
-    result = app->exec();
+public slots:
+    void onInitialMigrateFinished(QDBusPendingCallWatcher* aCall);
+    void onGetVersionFinished(QDBusPendingCallWatcher* aCall);
 
-    delete view;
-    delete app;
-    return result;
-}
+private:
+    int iMajor;
+    int iMinor;
+    int iMicro;
+    bool iAvailable;
+};
+
+#endif // MMSENGINE_H

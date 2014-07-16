@@ -67,6 +67,10 @@
         <source>MMS Settings</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Please wait</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ValueEditor</name>
