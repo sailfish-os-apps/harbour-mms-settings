@@ -24,7 +24,7 @@ OTHER_FILES += \
     qml/cover/*.qml \
     qml/pages/*.qml \
     qml/cover/*.png \
-    rpm/harbour-mms-settings.changes.in \
+    rpm/harbour-mms-settings.changes \
     rpm/harbour-mms-settings.spec \
     translations/*.ts \
     harbour-mms-settings.desktop
