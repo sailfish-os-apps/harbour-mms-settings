@@ -65,20 +65,17 @@ Page {
         qsTr("Default"),"3000000"
     ]
 
+    property var engine
     property string ofonoModem: ofonoManager.modems[0]
     property bool simAvailable: simManager.present && simManager.subscriberIdentity
-    property bool startAnimationPlaying: startTimer.running || !mmsEngine.available
+    property bool startAnimationPlaying: startTimer.running || !engine || !engine.available
 
     OfonoManager { id: ofonoManager }
 
     OfonoSimManager {
         id: simManager
         modemPath: ofonoModem
-        onSubscriberIdentityChanged: if (subscriberIdentity) mmsEngine.migrateSettings(subscriberIdentity)
-    }
-
-    MmsEngine {
-        id: mmsEngine
+        onSubscriberIdentityChanged: if (subscriberIdentity && engine) engine.migrateSettings(subscriberIdentity)
     }
 
     SilicaFlickable {
@@ -152,7 +149,7 @@ Page {
             ValueEditor {
                 predefined: userAgentOptions
                 imsi: simManager.subscriberIdentity
-                engine: mmsEngine
+                engine: page.engine
                 key: "user-agent"
                 label: qsTr("User-Agent:")
             }
@@ -160,7 +157,7 @@ Page {
             ValueEditor {
                 predefined: userAgentProfileOptions
                 imsi: simManager.subscriberIdentity
-                engine: mmsEngine
+                engine: page.engine
                 key: "user-agent-profile"
                 label: qsTr("User Agent profile:")
             }
@@ -168,7 +165,7 @@ Page {
             ValueEditor {
                 predefined: maxMessageSizeOptions
                 imsi: simManager.subscriberIdentity
-                engine: mmsEngine
+                engine: page.engine
                 key: "max-message-size"
                 label: qsTr("Maximum message size:")
                 placeholderText: qsTr("Maximum size (bytes)")
@@ -189,7 +186,7 @@ Page {
             ValueEditor {
                 predefined: maxPixelsOptions
                 imsi: simManager.subscriberIdentity
-                engine: mmsEngine
+                engine: page.engine
                 key: "max-pixels"
                 label: qsTr("Maximum image size:")
                 placeholderText: qsTr("Maximum size (pixels)")

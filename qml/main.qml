@@ -30,9 +30,11 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.mms.settings.config 1.0
 import "pages"
 
 ApplicationWindow {
-    initialPage: Component { SettingsPage { } }
+    initialPage: Component { SettingsPage { engine: mmsEngine } }
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
+    MmsEngine { id: mmsEngine }
 }

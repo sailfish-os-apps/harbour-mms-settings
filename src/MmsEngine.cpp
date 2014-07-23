@@ -40,7 +40,8 @@ MmsEngine::MmsEngine(QObject* aParent):
     iMajor(0),
     iMinor(0),
     iMicro(0),
-    iAvailable(false)
+    iAvailable(false),
+    iVersionKnown(false)
 {
     // Request migration for the current SIM
     call(SLOT(onInitialMigrateFinished(QDBusPendingCallWatcher*)),
@@ -87,7 +88,10 @@ void MmsEngine::onGetVersionFinished(QDBusPendingCallWatcher* aCall)
         iMinor = reply.argumentAt<1>();
         iMicro = reply.argumentAt<2>();
         QDEBUG(version());
-        if (!iMajor) {
+        if (iMajor) {
+            iVersionKnown = true;
+            emit versionKnownChanged();
+        } else {
             QDEBUG("Assuming 1.0.22");
             iMajor = 1;
             iMinor = 0;
@@ -104,6 +108,11 @@ void MmsEngine::onGetVersionFinished(QDBusPendingCallWatcher* aCall)
 bool MmsEngine::available() const
 {
     return iAvailable;
+}
+
+bool MmsEngine::versionKnown() const
+{
+    return iVersionKnown;
 }
 
 bool MmsEngine::laterThan(int aMajor, int aMinor, int aMicro) const

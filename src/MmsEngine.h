@@ -40,6 +40,7 @@ class MmsEngine: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString version READ version NOTIFY versionChanged)
+    Q_PROPERTY(bool versionKnown READ versionKnown NOTIFY versionKnownChanged)
     Q_PROPERTY(bool available READ available NOTIFY availableChanged)
 
 public:
@@ -47,6 +48,7 @@ public:
 
     QString version() const;
     bool available() const;
+    bool versionKnown() const;
     bool laterThan(int aMajor, int aMinor, int aMicro) const;
 
     Q_INVOKABLE void migrateSettings(QString aImsi);
@@ -57,6 +59,7 @@ private:
 
 signals:
     void versionChanged();
+    void versionKnownChanged();
     void availableChanged();
 
 public slots:
@@ -68,6 +71,7 @@ private:
     int iMinor;
     int iMicro;
     bool iAvailable;
+    bool iVersionKnown;
 };
 
 #endif // MMSENGINE_H

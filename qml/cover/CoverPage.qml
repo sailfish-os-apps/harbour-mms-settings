@@ -32,8 +32,18 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 CoverBackground {
-    Image {
+    id: cover
+    property var engine: pageStack.currentPage.engine
+    Column {
+        spacing: cover.height / 10
         anchors.centerIn: parent
-        source: Qt.resolvedUrl("cover-image.png")
+        Image {
+            anchors.horizontalCenter: parent.horizontalCenter
+            source: Qt.resolvedUrl("cover-image.png")
+        }
+        Label {
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: (engine && engine.versionKnown) ? engine.version : ""
+        }
     }
 }
