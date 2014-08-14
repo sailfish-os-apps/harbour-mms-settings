@@ -99,7 +99,7 @@ Column {
                 right: parent.right
             }
             text: (comboBox.currentIndex < predefined.length/2) ? format(predefined[comboBox.currentIndex*2+1]) : ""
-            color: (parent.canCopy && (parent.pressed || parent.menuOpen)) ? Theme.highlightColor : Theme.primaryColor
+            color: (parent.canCopy && (parent.pressed || parent.menuOpen)) ? Theme.secondaryHighlightColor : Theme.secondaryColor
             width: parent.width
             font.pixelSize: Theme.fontSizeExtraSmall
             wrapMode: Text.Wrap
@@ -117,6 +117,7 @@ Column {
     TextField {
         id: customText
         width: parent.width
+        color: Theme.secondaryColor
         visible: comboBox.currentIndex === predefined.length/2
         inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
         EnterKey.onClicked: focus = false
