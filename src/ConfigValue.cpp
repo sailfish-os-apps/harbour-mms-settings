@@ -81,15 +81,20 @@ void ConfigValue::setImsi(QString aImsi)
 
 QVariant ConfigValue::value() const
 {
-    return iItem ? iItem->value(iDefaultValue) : QVariant();
+    return iValue;
 }
 
 void ConfigValue::setValue(QVariant aValue)
 {
-    if (value() != aValue && iItem) {
-        QVERIFY(aValue.convert(iDefaultValue.type()));
-        iItem->set(aValue);
-        iItem->sync();
+    QVariant value(aValue);
+    if (value.convert(iDefaultValue.type()) && iItem) {
+        if (iValue != value) {
+            iValue = value;
+            iItem->set(value);
+            iItem->sync();
+        }
+    } else {
+        QDEBUG(iKey << "ignoring" << aValue);
     }
 }
 
@@ -143,13 +148,13 @@ void ConfigValue::onEngineAvailableChanged()
 
 void ConfigValue::onValueChanged()
 {
-    QDEBUG(dconfPath() << "=" << value());
-    emit valueChanged();
+    QDEBUG(iItem->value());
+    updateValue(iItem->value());
 }
 
 void ConfigValue::updateMGConfItem()
 {
-    QVariant oldValue = value();
+    QVariant value;
     if (iItem) {
         delete iItem;
         iItem = NULL;
@@ -159,10 +164,19 @@ void ConfigValue::updateMGConfItem()
         if (!path.isEmpty()) {
             iItem = new MGConfItem(path, this);
             connect(iItem, SIGNAL(valueChanged()), SLOT(onValueChanged()));
+            value = iItem->value();
+            if (!value.isValid()) value = iDefaultValue;
         }
+        QDEBUG(dconfPath());
     }
-    if (value() != oldValue) {
-        QDEBUG(dconfPath() << "=" << value());
+    updateValue(value);
+}
+
+void ConfigValue::updateValue(QVariant aValue)
+{
+    if (aValue.convert(iDefaultValue.type()) && aValue != iValue) {
+        QDEBUG(iKey << "=" << aValue);
+        iValue = aValue;
         emit valueChanged();
     }
 }

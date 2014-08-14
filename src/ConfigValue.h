@@ -78,13 +78,15 @@ signals:
 private:
     void updateMGConfItem();
     void updateDefaultValue();
+    void updateValue(QVariant aValue);
     QString dconfPath();
 
 private:
     MGConfItem* iItem;
     MmsEngine* iEngine;
-    QString iKey;
     QString iImsi;
+    QString iKey;
+    QVariant iValue;
     QVariant iDefaultValue;
 };
 
