@@ -5,7 +5,7 @@
 
 Name:       harbour-mms-settings
 Summary:    Advanced MMS settings
-Version:    1.0.3
+Version:    1.0.4
 Release:    1
 Group:      Qt/Qt
 License:    GPLv3
