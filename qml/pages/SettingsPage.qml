@@ -144,7 +144,17 @@ Page {
             width: parent.width
             spacing: Theme.paddingLarge
 
-            PageHeader { title: qsTr("MMS Settings") }
+            PageHeader {
+                title: qsTr("MMS Settings")
+                Image {
+                    anchors {
+                        verticalCenter: parent.verticalCenter
+                        left: parent.left
+                        leftMargin: Theme.paddingLarge
+                    }
+                    source: "image://theme/icon-m-sailfish"
+                }
+            }
 
             ValueEditor {
                 predefined: userAgentOptions
@@ -169,6 +179,7 @@ Page {
                 key: "max-message-size"
                 label: qsTr("Maximum message size:")
                 placeholderText: qsTr("Maximum size (bytes)")
+                customTextLabel: qsTr("Bytes")
                 inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhDigitsOnly
                 formatter: QtObject {
                     function format(size) {
@@ -190,6 +201,7 @@ Page {
                 key: "max-pixels"
                 label: qsTr("Maximum image size:")
                 placeholderText: qsTr("Maximum size (pixels)")
+                customTextLabel: qsTr("Pixels")
                 inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhDigitsOnly
                 formatter: QtObject {
                     function format(size) {

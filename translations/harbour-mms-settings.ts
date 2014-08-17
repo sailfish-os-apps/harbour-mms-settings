@@ -71,6 +71,14 @@
         <source>Please wait</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Bytes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pixels</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ValueEditor</name>
