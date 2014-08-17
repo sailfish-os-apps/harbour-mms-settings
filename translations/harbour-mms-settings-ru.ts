@@ -71,6 +71,14 @@
         <source>Please wait</source>
         <translation>Секундочку</translation>
     </message>
+    <message>
+        <source>Bytes</source>
+        <translation>Размер в байтах</translation>
+    </message>
+    <message>
+        <source>Pixels</source>
+        <translation>Размер в пикселях</translation>
+    </message>
 </context>
 <context>
     <name>ValueEditor</name>

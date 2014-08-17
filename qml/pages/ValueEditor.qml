@@ -44,6 +44,7 @@ Column {
     property alias engine: configValue.engine
     property alias label: comboBox.label
     property alias validator: customText.validator
+    property alias customTextLabel: customText.label
     property alias placeholderText: customText.placeholderText
     property alias inputMethodHints: customText.inputMethodHints
     property var formatter
