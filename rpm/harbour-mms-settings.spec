@@ -5,11 +5,11 @@
 
 Name:       harbour-mms-settings
 Summary:    Advanced MMS settings
-Version:    1.0.4
+Version:    1.0.5
 Release:    1
 Group:      Qt/Qt
 License:    GPLv3
-URL:        http://jolla.com/
+URL:        https://github.com/monich/harbour-mms-settings
 Source0:    %{name}-%{version}.tar.bz2
 
 Requires:      sailfishsilica-qt5 >= 0.10.9
@@ -25,7 +25,7 @@ BuildRequires: desktop-file-utils
 BuildRequires: qt5-qttools-linguist
 
 %description
-Advanced MMS settings
+Advanced MMS settings for SailfishOS
 
 %prep
 %setup -q -n %{name}-%{version}
