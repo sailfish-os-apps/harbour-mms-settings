@@ -49,7 +49,8 @@ Page {
     readonly property var userAgentProfileOptions: [
         "Jolla","http://static.jolla.com/uaprof/Jolla.xml",
         "Nokia N9","http://nds1.nds.nokia.com/uaprof/NN9-00r100-R.xml",
-        "Windows (Lumia)","http://nds1.nds.nokia.com/uaprof/Nokia800r100.xml"
+        "Windows (Lumia)","http://nds1.nds.nokia.com/uaprof/Nokia800r100.xml",
+        "iPhone","http://iphonemms.apple.com/iphone/uaprof-2MB.rdf"
     ]
 
     // Predefined message sizes:
