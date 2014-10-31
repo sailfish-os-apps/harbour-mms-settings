@@ -207,6 +207,9 @@ bool QOfonoConnectionManager::roamingAllowed() const
 
 void QOfonoConnectionManager::setRoamingAllowed(bool value)
 {
+    if (roamingAllowed() == value)
+        return;
+
     QString str("RoamingAllowed");
     QDBusVariant var(value);
     setOneProperty(str,var);
@@ -222,6 +225,9 @@ bool QOfonoConnectionManager::powered() const
 
 void QOfonoConnectionManager::setPowered(bool value)
 {
+    if (powered() == value)
+        return;
+
     QString str("Powered");
     QDBusVariant var(value);
     setOneProperty(str,var);
@@ -243,16 +249,6 @@ void QOfonoConnectionManager::updateProperty(const QString &property, const QVar
         d_ptr->properties.remove(property);
 
     if (property == QLatin1String("Attached")) {
-        if (value.value<bool>()) {
-            if (d_ptr->contextTypes.isEmpty()) {
-                d_ptr->getContexts();
-                Q_EMIT contextsChanged(d_ptr->contexts);
-            }
-        } else {
-            d_ptr->contextTypes.clear();
-            d_ptr->contexts.clear();
-            Q_EMIT contextsChanged(d_ptr->contexts);
-        }
         Q_EMIT attachedChanged(value.value<bool>());
     } else if (property == QLatin1String("Bearer")) {
         Q_EMIT bearerChanged(value.value<QString>());
@@ -319,6 +315,7 @@ void QOfonoConnectionManager::setOneProperty(const QString &prop, const QDBusVar
 
 void QOfonoConnectionManager::addContextFinished(QDBusPendingCallWatcher *watch)
 {
+    watch->deleteLater();
     QDBusPendingReply<QDBusObjectPath> reply = *watch;
     if (reply.isError()) {
         qDebug() << Q_FUNC_INFO << reply.error();
@@ -328,6 +325,7 @@ void QOfonoConnectionManager::addContextFinished(QDBusPendingCallWatcher *watch)
 
 void QOfonoConnectionManager::removeContextFinished(QDBusPendingCallWatcher *watch)
 {
+    watch->deleteLater();
     QDBusPendingReply<> reply = *watch;
     if (reply.isError()) {
         qDebug() << Q_FUNC_INFO << reply.error();
@@ -337,6 +335,7 @@ void QOfonoConnectionManager::removeContextFinished(QDBusPendingCallWatcher *wat
 
 void QOfonoConnectionManager::setPropertyFinished(QDBusPendingCallWatcher *watch)
 {
+    watch->deleteLater();
     QDBusPendingReply<> reply = *watch;
     if (reply.isError()) {
         qDebug() << Q_FUNC_INFO << reply.error();

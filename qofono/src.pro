@@ -10,12 +10,12 @@ include(version.pri)
 
 equals(QT_MAJOR_VERSION, 4): {
     TARGET = qofono
-    pkgconfig.path = $$INSTALL_ROOT$$PREFIX/lib/pkgconfig
+    pkgconfig.path = $$[QT_INSTALL_LIBS]/pkgconfig
 }
 
 equals(QT_MAJOR_VERSION, 5): {
     TARGET = qofono-qt5
-    pkgconfig.path = $$INSTALL_ROOT$$PREFIX/lib/pkgconfig-qt5
+    pkgconfig.path = $$[QT_INSTALL_LIBS]/pkgconfig-qt5
 }
 
 TEMPLATE = lib
@@ -54,7 +54,6 @@ XML_FILES += \
     dbus/ofono_push_notification.xml \
     dbus/ofono_radio_settings.xml \
     dbus/ofono_simmanager.xml \
-    dbus/ofono_settings.xml \
     dbus/ofono_smart_messaging.xml \
     dbus/ofono_smart_messaging_agent.xml \
     dbus/ofono_supplementary_services.xml \
@@ -97,8 +96,6 @@ DBUS_FILES +=\
     dbus/ofonopositioningrequestagent\
     dbus/ofonopushnotification\
     dbus/ofonoradiosettings\
-    dbus/ofonosettings\
-    dbus/ofonosettingsdata\
     dbus/ofonosimmanager\
     dbus/ofonosmartmessaging\
     dbus/ofonosmartmessagingagent\
@@ -138,7 +135,6 @@ SOURCES += $$DBUS_SOURCES\
     qofonosimmanager.cpp \
     qofonophonebook.cpp \
     qofonopositioningrequestagent.cpp \
-    qofonosettings.cpp \
     qofonosmartmessaging.cpp \
     qofonosmartmessagingagent.cpp \
     qofonovoicecall.cpp \
@@ -148,11 +144,8 @@ SOURCES += $$DBUS_SOURCES\
     qofonotexttelephony.cpp
 
 PUBLIC_HEADERS += \
-        qofono.h\
-        qofono_global.h
-
-HEADERS += $$DBUS_HEADERS \
-    $$PUBLIC_HEADERS \
+    qofono.h \
+    qofono_global.h \
     qofonomanager.h \
     dbustypes.h \
     qofonomodem.h \
@@ -178,7 +171,6 @@ HEADERS += $$DBUS_HEADERS \
     qofonosimmanager.h \
     qofonophonebook.h \
     qofonopositioningrequestagent.h \
-    qofonosettings.h \
     qofonosmartmessaging.h \
     qofonosmartmessagingagent.h \
     qofonovoicecall.h \
@@ -186,6 +178,11 @@ HEADERS += $$DBUS_HEADERS \
     qofonoradiosettings.h \
     qofonosupplementaryservices.h \
     qofonotexttelephony.h
+
+HEADERS += \
+    $$DBUS_HEADERS \
+    $$PUBLIC_HEADERS \
+    qofonoutils_p.h
 
     QT -= gui
 equals(QT_MAJOR_VERSION, 4): {
@@ -206,8 +203,8 @@ equals(QT_MAJOR_VERSION, 5): {
     xmlfiles.path = $$INSTALL_ROOT$$PREFIX/include/qofono-qt5/dbus
 }
 
-target.path = $$INSTALL_ROOT$$PREFIX/lib
-headers.files = $$HEADERS
+target.path = $$[QT_INSTALL_LIBS]
+headers.files = $$PUBLIC_HEADERS
 
 dbusheaders.files = $$DBUS_HEADERS
 
