@@ -112,7 +112,7 @@ Page {
 
         Column {
             id: splashScreen
-            visible: startAnimationPlaying
+            visible: startAnimationPlaying && simAvailable
             x: (page.width - childrenRect.width)/2
             y: (page.height - busyIndicator.height)/2 - pleaseWait.height - spacing
             spacing: Theme.paddingLarge
