@@ -1,3 +1,6 @@
+* Fri Oct 31 2014 Slava Monich <slava.monich@jolla.com> 1.0.6
+- Fixed startup behavior without a SIM card
+
 * Wed Sep 24 2014 Slava Monich <slava.monich@jolla.com> 1.0.5
 - Added predefined UserAgent profile for iPhone
 
