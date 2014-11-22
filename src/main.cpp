@@ -52,7 +52,7 @@ void registerConfigTypes(const char* uri, int v1 = 1, int v2 = 0)
     qmlRegisterType<MmsEngine>(uri, v1, v2, "MmsEngine");
 }
 
-int main(int argc, char *argv[])
+Q_DECL_EXPORT int main(int argc, char *argv[])
 {
     int result = 0;
     QGuiApplication* app = SailfishApp::application(argc, argv);
