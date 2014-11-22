@@ -20,6 +20,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Small (100 kB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Medium (300 kB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Large (600 kB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extra large (1 MB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>User-Agent:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -45,6 +61,10 @@
     </message>
     <message>
         <source>Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default (3 MP)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

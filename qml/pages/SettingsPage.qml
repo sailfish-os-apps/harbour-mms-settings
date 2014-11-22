@@ -38,32 +38,78 @@ Page {
 
     // Predefined user agents:
     readonly property var userAgentOptions: [
-        "Jolla","Mozilla/5.0 (Sailfish; Jolla)",
-        "Nokia N9","Mozilla/5.0 (MeeGo; NokiaN9) AppleWebKit/534.13 (KHTML, likeGecko) NokiaBrowser/8.5.0 Mobile Safari/534.13",
-        "iOS (iPhone 5)","Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7",
-        "Windows (Lumia 1020)","Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch; NOKIA; Lumia 1020)",
-        "Android (Galaxy S4)","Mozilla/5.0 (Linux; U; Android 4.2; en-us; GT-I9500 Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+        {
+            text:  "Jolla",
+            menu:  "Jolla",
+            value: "Mozilla/5.0 (Sailfish; Jolla)"
+        },{
+            text: "Nokia N9",
+            menu: "Nokia N9",
+            value: "Mozilla/5.0 (MeeGo; NokiaN9) AppleWebKit/534.13 (KHTML, likeGecko) NokiaBrowser/8.5.0 Mobile Safari/534.13"
+        },{
+            text:  "iOS",
+            menu:  "iOS (iPhone 5)",
+            value: "Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7"
+        },{
+            text:  "Windows",
+            menu:  "Windows (Lumia 1020)",
+            value: "Mozilla/5.0 (compatible; MSIE 10.0; Windows Phone 8.0; Trident/6.0; IEMobile/10.0; ARM; Touch; NOKIA; Lumia 1020)"
+        },{
+            text:  "Android",
+            menu:  "Android (Galaxy S4)",
+            value: "Mozilla/5.0 (Linux; U; Android 4.2; en-us; GT-I9500 Build/JDQ39) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+        }
     ]
 
     // Predefined user agent profiles:
     readonly property var userAgentProfileOptions: [
-        "Jolla","http://static.jolla.com/uaprof/Jolla.xml",
-        "Nokia N9","http://nds1.nds.nokia.com/uaprof/NN9-00r100-R.xml",
-        "Windows (Lumia)","http://nds1.nds.nokia.com/uaprof/Nokia800r100.xml",
-        "iPhone","http://iphonemms.apple.com/iphone/uaprof-2MB.rdf"
+        {
+            text:  "Jolla",
+            menu:  "Jolla",
+            value: "http://static.jolla.com/uaprof/Jolla.xml"
+        },{
+            text:  "Nokia N9",
+            menu:  "Nokia N9",
+            value: "http://nds1.nds.nokia.com/uaprof/NN9-00r100-R.xml"
+        },{
+            text:  "Windows",
+            menu:  "Windows (Lumia)",
+            value: "http://nds1.nds.nokia.com/uaprof/Nokia800r100.xml"
+        },{
+            text:  "iPhone",
+            menu:  "iPhone",
+            value: "http://iphonemms.apple.com/iphone/uaprof-2MB.rdf"
+        }
     ]
 
     // Predefined message sizes:
     readonly property var maxMessageSizeOptions: [
-        qsTr("Small"),"102400",
-        qsTr("Medium"),"307200",
-        qsTr("Large"),"614400",
-        qsTr("Extra large"),"1048576"
+        {
+            text:  qsTr("Small"),
+            menu:  qsTr("Small (100 kB)"),
+            value: 102400
+        },{
+            text:  qsTr("Medium"),
+            menu:  qsTr("Medium (300 kB)"),
+            value: 307200
+        },{
+            text:  qsTr("Large"),
+            menu:  qsTr("Large (600 kB)"),
+            value: 614400
+        },{
+            text:  qsTr("Extra large"),
+            menu:  qsTr("Extra large (1 MB)"),
+            value: 1048576
+        }
     ]
 
     // Predefined pixel limits:
     readonly property var maxPixelsOptions: [
-        qsTr("Default"),"3000000"
+        {
+            text:  qsTr("Default"),
+            menu:  qsTr("Default (3 MP)"),
+            value: 3000000
+        }
     ]
 
     property var engine

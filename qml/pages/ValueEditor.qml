@@ -68,14 +68,15 @@ Column {
         id: comboBox
         width: parent.width
         menu: ContextMenu { }
+        value: (currentItem !== null && currentItem.valueText !== "") ? currentItem.valueText : ""
         onCurrentIndexChanged: {
             var wasUpdatingValue = updatingValue
             updatingValue = true
-            if (currentIndex === predefined.length/2) {
+            if (currentIndex === predefined.length) {
                 configValue.value = customText.text
                 if (!updatingIndex) customText.focus = true
             } else {
-                configValue.value = predefined[2*currentIndex + 1]
+                configValue.value = predefined[currentIndex].value
             }
             updatingValue = wasUpdatingValue
         }
@@ -85,7 +86,7 @@ Column {
         id: mouseArea
         property bool menuOpen: menu.parent === mouseArea
         property bool canCopy: customText.validator ? false : true
-        visible: comboBox.currentIndex < predefined.length/2
+        visible: comboBox.currentIndex < predefined.length
         height: menuOpen ? (menu.height + label.height) : label.height
         anchors {
             left: parent.left
@@ -99,7 +100,7 @@ Column {
                 left: parent.left
                 right: parent.right
             }
-            text: (comboBox.currentIndex < predefined.length/2) ? format(predefined[comboBox.currentIndex*2+1]) : ""
+            text: (comboBox.currentIndex < predefined.length) ? format(predefined[comboBox.currentIndex].value) : ""
             color: (parent.canCopy && (parent.pressed || parent.menuOpen)) ? Theme.secondaryHighlightColor : Theme.secondaryColor
             width: parent.width
             font.pixelSize: Theme.fontSizeExtraSmall
@@ -119,7 +120,7 @@ Column {
         id: customText
         width: parent.width
         color: Theme.secondaryColor
-        visible: comboBox.currentIndex === predefined.length/2
+        visible: comboBox.currentIndex === predefined.length
         inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
         EnterKey.onClicked: focus = false
         EnterKey.iconSource: "image://theme/icon-m-enter-close"
@@ -135,7 +136,7 @@ Column {
 
     Component {
         id: menuItemComponent
-        MenuItem {}
+        MenuItem { property string valueText }
     }
 
     function format(text) {
@@ -143,7 +144,7 @@ Column {
     }
 
     function resetMenu() {
-        var i, n = predefined ? predefined.length/2 : 0
+        var i, n = predefined ? predefined.length : 0
         var menu = comboBox.menu
         for (i = menu.children.length; i > 0 ; i--) {
             menu.children[i-1].destroy()
@@ -152,10 +153,9 @@ Column {
             var foundValue = false
             updatingIndex = true
             for (i = 0; i < n; i++) {
-                var name = predefined[2*i]
-                var predefinedValue = predefined[2*i+1]
-                menuItemComponent.createObject(menu._contentColumn, {"text": name } )
-                if (predefinedValue == configValue.value) {
+                var p = predefined[i]
+                menuItemComponent.createObject(menu._contentColumn, {"text": p.menu, "valueText": p.text } )
+                if (p.value == configValue.value) {
                     comboBox.currentIndex = i
                     foundValue = true
                 }
@@ -168,10 +168,10 @@ Column {
     }
 
     function updateSelection() {
-        var n = predefined ? predefined.length/2 : 0
+        var n = predefined ? predefined.length : 0
         if (n > 0) {
             for (var i = 0; i < n; i++) {
-                if (configValue.value == predefined[2*i+1]) {
+                if (configValue.value == predefined[i].value) {
                     updatingIndex = true
                     comboBox.currentIndex = i
                     updatingIndex = false

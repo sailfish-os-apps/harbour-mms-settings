@@ -20,6 +20,22 @@
         <translation>Очень большой</translation>
     </message>
     <message>
+        <source>Small (100 kB)</source>
+        <translation>Небольшой (100 КБ)</translation>
+    </message>
+    <message>
+        <source>Medium (300 kB)</source>
+        <translation>Средний (300 КБ)</translation>
+    </message>
+    <message>
+        <source>Large (600 kB)</source>
+        <translation>Большой (600 КБ)</translation>
+    </message>
+    <message>
+        <source>Extra large (1 MB)</source>
+        <translation>Очень большой (1 MБ)</translation>
+    </message>
+    <message>
         <source>User-Agent:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -46,6 +62,10 @@
     <message>
         <source>Default</source>
         <translation>Стандартный</translation>
+    </message>
+    <message>
+        <source>Default (3 MP)</source>
+        <translation>Стандартный (3 мегапикселя)</translation>
     </message>
     <message>
         <source>%1 pixels</source>
