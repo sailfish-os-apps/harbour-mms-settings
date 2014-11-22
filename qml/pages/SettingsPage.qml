@@ -85,20 +85,20 @@ Page {
     // Predefined message sizes:
     readonly property var maxMessageSizeOptions: [
         {
-            text:  qsTr("Small"),
-            menu:  qsTr("Small (100 kB)"),
+            text:  qsTr("max-message-size-text-small"),
+            menu:  qsTr("max-message-size-menu-small-100k"),
             value: 102400
         },{
-            text:  qsTr("Medium"),
-            menu:  qsTr("Medium (300 kB)"),
+            text:  qsTr("max-message-size-text-medium"),
+            menu:  qsTr("max-message-size-menu-medium-300k"),
             value: 307200
         },{
-            text:  qsTr("Large"),
-            menu:  qsTr("Large (600 kB)"),
+            text:  qsTr("max-message-size-text-large"),
+            menu:  qsTr("max-message-size-menu-large-600k"),
             value: 614400
         },{
-            text:  qsTr("Extra large"),
-            menu:  qsTr("Extra large (1 MB)"),
+            text:  qsTr("max-message-size-text-extra-large"),
+            menu:  qsTr("max-message-size-menu-extra-large-1M"),
             value: 1048576
         }
     ]
@@ -106,8 +106,8 @@ Page {
     // Predefined pixel limits:
     readonly property var maxPixelsOptions: [
         {
-            text:  qsTr("Default"),
-            menu:  qsTr("Default (3 MP)"),
+            text:  qsTr("max-pixels-text-default"),
+            menu:  qsTr("max-pixels-menu-default-3MP"),
             value: 3000000
         }
     ]
@@ -150,7 +150,7 @@ Page {
 
                     PropertyChanges {
                         target: placeholder
-                        text: qsTr("MMS settings are not available without SIM card")
+                        text: qsTr("no-sim-card-placeholder")
                     }
                 }
             ]
@@ -173,7 +173,7 @@ Page {
                 }
                 color: Theme.highlightColor
                 opacity: 0.6
-                text: qsTr("Please wait")
+                text: qsTr("please-wait-splash")
             }
             BusyIndicator {
                 id: busyIndicator
@@ -192,7 +192,7 @@ Page {
             spacing: Theme.paddingLarge
 
             PageHeader {
-                title: qsTr("MMS Settings")
+                title: qsTr("mms-settings-header")
                 Image {
                     anchors {
                         verticalCenter: parent.verticalCenter
@@ -208,7 +208,7 @@ Page {
                 imsi: simManager.subscriberIdentity
                 engine: page.engine
                 key: "user-agent"
-                label: qsTr("User-Agent:")
+                label: qsTr("user-agent-label")
             }
 
             ValueEditor {
@@ -216,7 +216,7 @@ Page {
                 imsi: simManager.subscriberIdentity
                 engine: page.engine
                 key: "user-agent-profile"
-                label: qsTr("User Agent profile:")
+                label: qsTr("user-agent-profile-label")
             }
 
             ValueEditor {
@@ -224,16 +224,16 @@ Page {
                 imsi: simManager.subscriberIdentity
                 engine: page.engine
                 key: "max-message-size"
-                label: qsTr("Maximum message size:")
-                placeholderText: qsTr("Maximum size (bytes)")
-                customTextLabel: qsTr("Bytes")
+                label: qsTr("max-message-size-label")
+                placeholderText: qsTr("max-message-size-placeholder")
+                customTextLabel: qsTr("max-message-size-custom-units")
                 inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhDigitsOnly
                 formatter: QtObject {
                     function format(size) {
                         if ((size % 1048576) === 0) {
-                            return qsTr("%1 MB").arg(size/1048576)
+                            return qsTr("max-message-size-format-MB").arg(size/1048576)
                         } else if ((size % 1024) === 0) {
-                            return qsTr("%1 kB").arg(size/1024)
+                            return qsTr("max-message-size-format-kB").arg(size/1024)
                         } else {
                             return size;
                         }
@@ -246,13 +246,13 @@ Page {
                 imsi: simManager.subscriberIdentity
                 engine: page.engine
                 key: "max-pixels"
-                label: qsTr("Maximum image size:")
-                placeholderText: qsTr("Maximum size (pixels)")
-                customTextLabel: qsTr("Pixels")
+                label: qsTr("max-pixels-label")
+                placeholderText: qsTr("max-pixels-placeholder")
+                customTextLabel: qsTr("max-pixels-custom-units")
                 inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhDigitsOnly
                 formatter: QtObject {
                     function format(size) {
-                        return qsTr("%1 pixels").arg(size);
+                        return qsTr("max-pixels-format").arg(size);
                     }
                 }
             }

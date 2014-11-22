@@ -109,7 +109,7 @@ Column {
         ContextMenu {
             id: menu
             MenuItem {
-                text: qsTr("Copy")
+                text: qsTr("value-menu-copy")
                 onClicked: Clipboard.text = label.text
             }
         }
@@ -160,8 +160,8 @@ Column {
                     foundValue = true
                 }
             }
-            var custom = customMenuText ? customMenuText : qsTr("Custom")
-            menuItemComponent.createObject(menu._contentColumn, {"text": custom } )
+            var custom = customMenuText ? customMenuText : qsTr("value-menu-custom")
+            menuItemComponent.createObject(menu._contentColumn, {"text": custom, "valueText": custom } )
             if (!foundValue) comboBox.currentIndex = n
             updatingIndex = false
         }

@@ -57,12 +57,15 @@ int main(int argc, char *argv[])
     int result = 0;
     QGuiApplication* app = SailfishApp::application(argc, argv);
 
+    QLocale locale;
     QTranslator* translator = new QTranslator(app);
     QString transDir = SailfishApp::pathTo("translations").toLocalFile();
-    if (translator->load(QLocale(), "harbour-mms-settings", "-", transDir)) {
+    QString transFile("harbour-mms-settings");
+    if (translator->load(locale, transFile, "-", transDir) ||
+        translator->load(transFile, transDir)) {
         app->installTranslator(translator);
     } else {
-        QDEBUG("Failed to load translator for" << QLocale());
+        QDEBUG("Failed to load translator for" << locale);
         delete translator;
     }
 
@@ -70,7 +73,7 @@ int main(int argc, char *argv[])
     registerConfigTypes(PLUGIN_PREFIX ".config");
 
     QQuickView *view = SailfishApp::createView();
-    view->setSource(SailfishApp::pathTo(QString("qml/main.qml")));
+    view->setSource(SailfishApp::pathTo("qml/main.qml"));
     view->show();
 
     result = app->exec();

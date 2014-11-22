@@ -4,111 +4,111 @@
 <context>
     <name>SettingsPage</name>
     <message>
-        <source>Small</source>
-        <translation type="unfinished"></translation>
+        <source>please-wait-splash</source>
+        <translation>Please wait</translation>
     </message>
     <message>
-        <source>Medium</source>
-        <translation type="unfinished"></translation>
+        <source>no-sim-card-placeholder</source>
+        <translation>MMS settings are not available without SIM card</translation>
     </message>
     <message>
-        <source>Large</source>
-        <translation type="unfinished"></translation>
+        <source>mms-settings-header</source>
+        <translation>MMS Settings</translation>
     </message>
     <message>
-        <source>Extra large</source>
-        <translation type="unfinished"></translation>
+        <source>user-agent-label</source>
+        <translation>User-Agent:</translation>
     </message>
     <message>
-        <source>Small (100 kB)</source>
-        <translation type="unfinished"></translation>
+        <source>user-agent-profile-label</source>
+        <translation>User Agent profile:</translation>
     </message>
     <message>
-        <source>Medium (300 kB)</source>
-        <translation type="unfinished"></translation>
+        <source>max-message-size-label</source>
+        <translation>Maximum message size:</translation>
     </message>
     <message>
-        <source>Large (600 kB)</source>
-        <translation type="unfinished"></translation>
+        <source>max-message-size-placeholder</source>
+        <translation>Maximum size (bytes)</translation>
     </message>
     <message>
-        <source>Extra large (1 MB)</source>
-        <translation type="unfinished"></translation>
+        <source>max-message-size-custom-units</source>
+        <translation>Bytes</translation>
     </message>
     <message>
-        <source>User-Agent:</source>
-        <translation type="unfinished"></translation>
+        <source>max-message-size-text-small</source>
+        <translation>Small</translation>
     </message>
     <message>
-        <source>User Agent profile:</source>
-        <translation type="unfinished"></translation>
+        <source>max-message-size-menu-small-100k</source>
+        <translation>Small (100 kB)</translation>
     </message>
     <message>
-        <source>Maximum message size:</source>
-        <translation type="unfinished"></translation>
+        <source>max-message-size-text-medium</source>
+        <translation>Medium</translation>
     </message>
     <message>
-        <source>%1 MB</source>
-        <translation type="unfinished"></translation>
+        <source>max-message-size-menu-medium-300k</source>
+        <translation>Medium (300 kB)</translation>
     </message>
     <message>
-        <source>%1 kB</source>
-        <translation type="unfinished"></translation>
+        <source>max-message-size-text-large</source>
+        <translation>Large</translation>
     </message>
     <message>
-        <source>MMS settings are not available without SIM card</source>
-        <translation type="unfinished"></translation>
+        <source>max-message-size-menu-large-600k</source>
+        <translation>Large (600 kB)</translation>
     </message>
     <message>
-        <source>Default</source>
-        <translation type="unfinished"></translation>
+        <source>max-message-size-text-extra-large</source>
+        <translation>Extra large</translation>
     </message>
     <message>
-        <source>Default (3 MP)</source>
-        <translation type="unfinished"></translation>
+        <source>max-message-size-menu-extra-large-1M</source>
+        <translation>Extra large (1 MB)</translation>
     </message>
     <message>
-        <source>%1 pixels</source>
-        <translation type="unfinished"></translation>
+        <source>max-message-size-format-MB</source>
+        <translation>%1 MB</translation>
     </message>
     <message>
-        <source>Maximum size (bytes)</source>
-        <translation type="unfinished"></translation>
+        <source>max-message-size-format-kB</source>
+        <translation>%1 kB</translation>
     </message>
     <message>
-        <source>Maximum image size:</source>
-        <translation type="unfinished"></translation>
+        <source>max-pixels-label</source>
+        <translation>Maximum image size:</translation>
     </message>
     <message>
-        <source>Maximum size (pixels)</source>
-        <translation type="unfinished"></translation>
+        <source>max-pixels-placeholder</source>
+        <translation>Maximum size (pixels)</translation>
     </message>
     <message>
-        <source>MMS Settings</source>
-        <translation type="unfinished"></translation>
+        <source>max-pixels-custom-units</source>
+        <translation>Pixels</translation>
     </message>
     <message>
-        <source>Please wait</source>
-        <translation type="unfinished"></translation>
+        <source>max-pixels-text-default</source>
+        <translation>Default</translation>
     </message>
     <message>
-        <source>Bytes</source>
-        <translation type="unfinished"></translation>
+        <source>max-pixels-menu-default-3MP</source>
+        <translation>Default (3 MP)</translation>
     </message>
     <message>
-        <source>Pixels</source>
-        <translation type="unfinished"></translation>
+        <source>max-pixels-format</source>
+        <translation>%1 pixels</translation>
     </message>
 </context>
 <context>
     <name>ValueEditor</name>
     <message>
-        <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <source>value-menu-copy</source>
+        <translation>Copy</translation>
     </message>
     <message>
-        <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <source>value-menu-custom</source>
+        <translation>Custom</translation>
     </message>
 </context>
 </TS>
