@@ -113,7 +113,6 @@ Page {
     ]
 
     property var engine
-    property string ofonoModem: ofonoManager.modems.length > 0 ? ofonoManager.modems[0] : ""
     property bool simAvailable: simManager.present && simManager.subscriberIdentity
     property bool startAnimationPlaying: startTimer.running || !engine || !engine.available
 
@@ -121,7 +120,7 @@ Page {
 
     OfonoSimManager {
         id: simManager
-        modemPath: ofonoModem
+        modemPath: ofonoManager.defaultModem
         onSubscriberIdentityChanged: if (subscriberIdentity && engine) engine.migrateSettings(subscriberIdentity)
     }
 
