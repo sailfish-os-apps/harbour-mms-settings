@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Jolla Ltd.
+** Copyright (C) 2013-2014 Jolla Ltd.
 ** Contact: lorn.potter@jollamobile.com
 **
 ** GNU Lesser General Public License Usage
@@ -16,85 +16,41 @@
 #include "qofonoradiosettings.h"
 #include "dbus/ofonoradiosettings.h"
 
-class QOfonoRadioSettingsPrivate
-{
-public:
-    QOfonoRadioSettingsPrivate();
-    QString modemPath;
-    OfonoRadioSettings *radioSettings;
-    QVariantMap properties;
-
-};
-
-QOfonoRadioSettingsPrivate::QOfonoRadioSettingsPrivate() :
-    modemPath(QString())
-  , radioSettings(0)
-{
-}
+#define SUPER QOfonoObject
 
 QOfonoRadioSettings::QOfonoRadioSettings(QObject *parent) :
-    QObject(parent)
-  , d_ptr(new QOfonoRadioSettingsPrivate)
+    SUPER(parent)
 {
 }
 
 QOfonoRadioSettings::~QOfonoRadioSettings()
 {
-    delete d_ptr;
+}
+
+QDBusAbstractInterface *QOfonoRadioSettings::createDbusInterface(const QString &path)
+{
+    return new OfonoRadioSettings("org.ofono", path, QDBusConnection::systemBus(), this);
+}
+
+void QOfonoRadioSettings::objectPathChanged(const QString &path, const QVariantMap *properties)
+{
+    SUPER::objectPathChanged(path, properties);
+    Q_EMIT modemPathChanged(path);
 }
 
 void QOfonoRadioSettings::setModemPath(const QString &path)
 {
-    if (path == d_ptr->modemPath ||
-            path.isEmpty())
-        return;
-
-    QStringList removedProperties = d_ptr->properties.keys();
-
-    delete d_ptr->radioSettings;
-    d_ptr->radioSettings = new OfonoRadioSettings("org.ofono", path, QDBusConnection::systemBus(),this);
-
-    if (d_ptr->radioSettings->isValid()) {
-        d_ptr->modemPath = path;
-
-        connect(d_ptr->radioSettings,SIGNAL(PropertyChanged(QString,QDBusVariant)),
-                this,SLOT(propertyChanged(QString,QDBusVariant)));
-
-        QVariantMap properties = d_ptr->radioSettings->GetProperties().value();
-        for (QVariantMap::ConstIterator it = properties.constBegin();
-             it != properties.constEnd(); ++it) {
-            updateProperty(it.key(), it.value());
-            removedProperties.removeOne(it.key());
-        }
-
-        Q_EMIT modemPathChanged(path);
-    }
-
-    foreach (const QString &p, removedProperties)
-        updateProperty(p, QVariant());
+    setObjectPath(path);
 }
 
 QString QOfonoRadioSettings::modemPath() const
 {
-    return d_ptr->modemPath;
+    return objectPath();
 }
 
-
-void QOfonoRadioSettings::propertyChanged(const QString& property, const QDBusVariant& dbusvalue)
+void QOfonoRadioSettings::propertyChanged(const QString &property, const QVariant &value)
 {
-    updateProperty(property, dbusvalue.variant());
-}
-
-void QOfonoRadioSettings::updateProperty(const QString &property, const QVariant &value)
-{
-    if (d_ptr->properties.value(property) == value)
-        return;
-
-    if (value.isValid())
-        d_ptr->properties.insert(property, value);
-    else
-        d_ptr->properties.remove(property);
-
+    SUPER::propertyChanged(property, value);
     if (property == QLatin1String("TechnologyPreference")) {
         Q_EMIT technologyPreferenceChanged(value.value<QString>());
     } else if (property == QLatin1String("GsmBand")) {
@@ -108,49 +64,45 @@ void QOfonoRadioSettings::updateProperty(const QString &property, const QVariant
 
 QString QOfonoRadioSettings::technologyPreference() const
 {
-    return d_ptr->properties["TechnologyPreference"].value<QString>();
+    return getString("TechnologyPreference");
 }
 
 void QOfonoRadioSettings::setTechnologyPreference(const QString &preference)
 {
-    if( d_ptr->radioSettings)
-        d_ptr->radioSettings->SetProperty("TechnologyPreference", QDBusVariant(preference));
+    setProperty("TechnologyPreference",  preference);
 }
 
 QString QOfonoRadioSettings::gsmBand() const
 {
-    return d_ptr->properties["GsmBand"].value<QString>();
+    return getString("GsmBand");
 }
 
 void QOfonoRadioSettings::setGsmBand(const QString &gsmBand)
 {
-    if( d_ptr->radioSettings)
-        d_ptr->radioSettings->SetProperty("GsmBand", QDBusVariant(gsmBand));
+    setProperty("GsmBand", gsmBand);
 }
 
 QString QOfonoRadioSettings::umtsBand() const
 {
-    return d_ptr->properties["UmtsBand"].value<QString>();
+    return getString("UmtsBand");
 }
 
 void QOfonoRadioSettings::setUmtsBand(const QString &umtsBand)
 {
-    if( d_ptr->radioSettings)
-        d_ptr->radioSettings->SetProperty("UmtsBand", QDBusVariant(umtsBand));
+    setProperty("UmtsBand", umtsBand);
 }
 
 bool QOfonoRadioSettings::fastDormancy() const
 {
-    return d_ptr->properties["FastDormancy"].value<bool>();
+    return getBool("FastDormancy");
 }
 
 void QOfonoRadioSettings::setFastDormancy(bool fastDormancy)
 {
-    if( d_ptr->radioSettings)
-        d_ptr->radioSettings->SetProperty("FastDormancy", QDBusVariant(fastDormancy));
+    setProperty("FastDormancy", fastDormancy);
 }
 
 bool QOfonoRadioSettings::isValid() const
 {
-    return d_ptr->radioSettings->isValid();
+    return SUPER::isValid();
 }

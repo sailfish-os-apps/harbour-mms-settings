@@ -1,3 +1,7 @@
+* Mon Dec 15 2014 Slava Monich <slava.monich@jolla.com> 1.0.7
+- Updates qofono to version 0.67
+- More descriptive menus
+
 * Fri Oct 31 2014 Slava Monich <slava.monich@jolla.com> 1.0.6
 - Fixed startup behavior without a SIM card
 

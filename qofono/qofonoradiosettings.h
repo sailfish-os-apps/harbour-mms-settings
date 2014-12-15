@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Jolla Ltd.
+** Copyright (C) 2013-2014 Jolla Ltd.
 ** Contact: lorn.potter@jollamobile.com
 **
 ** GNU Lesser General Public License Usage
@@ -16,22 +16,18 @@
 #ifndef QOFONORadioSettings_H
 #define QOFONORadioSettings_H
 
-#include <QObject>
-#include <QDBusVariant>
-
+#include "qofonoobject.h"
 #include "qofono_global.h"
+
 //! This class is used to access ofono radio settings API
 /*!
  * The API is documented in
  * http://git.kernel.org/?p=network/ofono/ofono.git;a=blob_plain;f=doc/radio-settings-api.txt
  */
-
-class QOfonoRadioSettingsPrivate;
-class QOFONOSHARED_EXPORT QOfonoRadioSettings : public QObject
+class QOFONOSHARED_EXPORT QOfonoRadioSettings : public QOfonoObject
 {
     Q_OBJECT
     Q_PROPERTY(QString modemPath READ modemPath WRITE setModemPath NOTIFY modemPathChanged)
-
     Q_PROPERTY(QString technologyPreference READ technologyPreference WRITE setTechnologyPreference NOTIFY technologyPreferenceChanged)
     Q_PROPERTY(QString gsmBand READ gsmBand WRITE setGsmBand NOTIFY gsmBandChanged)
     Q_PROPERTY(QString umtsBand READ umtsBand WRITE setUmtsBand NOTIFY umtsBandChanged)
@@ -57,6 +53,7 @@ public:
     void setFastDormancy(bool fastDormancy);
 
     bool isValid() const;
+
 Q_SIGNALS:
     void technologyPreferenceChanged(const QString &preference);
     void gsmBandChanged(const QString &gsmBand);
@@ -64,14 +61,10 @@ Q_SIGNALS:
     void fastDormancyChanged(bool fastDormancy);
     void modemPathChanged(const QString &path);
 
-public slots:
-    
-private:
-    void updateProperty(const QString &property, const QVariant &value);
-
-    QOfonoRadioSettingsPrivate *d_ptr;
-private slots:
-    void propertyChanged(const QString &property,const QDBusVariant &value);
+protected:
+    QDBusAbstractInterface *createDbusInterface(const QString &path);
+    void propertyChanged(const QString &key, const QVariant &value);
+    void objectPathChanged(const QString &path, const QVariantMap *properties);
 };
 
 #endif // QOFONORadioSettings_H

@@ -31,8 +31,11 @@ OTHER_FILES += \
 
 # qofono
 SOURCES += \
+    qofono/qofonodbustypes.cpp \
     qofono/qofonomanager.cpp \
     qofono/qofonomodem.cpp \
+    qofono/qofonomodeminterface.cpp \
+    qofono/qofonoobject.cpp \
     qofono/qofonosimmanager.cpp \
     qofono/dbus/ofonomanager.cpp \
     qofono/dbus/ofonomodem.cpp \
@@ -41,6 +44,8 @@ SOURCES += \
 HEADERS += \
     qofono/qofonomanager.h \
     qofono/qofonomodem.h \
+    qofono/qofonomodeminterface.h \
+    qofono/qofonoobject.h \
     qofono/qofonosimmanager.h \
     qofono/dbus/ofonomanager.h \
     qofono/dbus/ofonomodem.h \

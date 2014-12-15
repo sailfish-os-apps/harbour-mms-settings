@@ -4,7 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += dbus xmlpatterns
+QT += dbus xmlpatterns
+QMAKE_CXXFLAGS += -Wno-unused-parameter
 
 include(version.pri)
 
@@ -110,9 +111,13 @@ for(s,DBUS_FILES) {
 }
 
 SOURCES += $$DBUS_SOURCES\
-        qofono.cpp \
+    qofono.cpp \
+    qofonodbustypes.cpp \
+    qofonoobject.cpp \
     qofonomanager.cpp \
     qofonomodem.cpp \
+    qofonomodeminterface.cpp \
+    qofonomodeminterface2.cpp \
     qofonoassistedsatellitenavigation.cpp \
     qofonoconnectionmanager.cpp \
     qofonoconnectioncontext.cpp \
@@ -146,9 +151,12 @@ SOURCES += $$DBUS_SOURCES\
 PUBLIC_HEADERS += \
     qofono.h \
     qofono_global.h \
+    qofonoobject.h \
     qofonomanager.h \
     dbustypes.h \
     qofonomodem.h \
+    qofonomodeminterface.h \
+    qofonomodeminterface2.h \
     qofonoassistedsatellitenavigation.h \
     qofonoconnectionmanager.h \
     qofonoconnectioncontext.h \

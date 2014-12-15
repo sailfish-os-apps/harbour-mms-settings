@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Jolla Ltd.
+** Copyright (C) 2013-2014 Jolla Ltd.
 ** Contact: lorn.potter@jollamobile.com
 **
 ** GNU Lesser General Public License Usage
@@ -16,23 +16,20 @@
 #ifndef QOFONOCONNECTIONCONTEXT_H
 #define QOFONOCONNECTIONCONTEXT_H
 
-#include <QObject>
-#include "dbustypes.h"
+#include "qofonoobject.h"
 #include "qofono_global.h"
+
 //! This class is used to access ofono connman context API
 /*!
  * The API is documented in
  * http://git.kernel.org/?p=network/ofono/ofono.git;a=blob;f=doc/connman-api.txt
  */
-
-class QOfonoConnectionContextPrivate;
-
-class QOFONOSHARED_EXPORT QOfonoConnectionContext : public QObject
+class QOFONOSHARED_EXPORT QOfonoConnectionContext : public QOfonoObject
 {
     Q_OBJECT
     Q_PROPERTY(bool active READ active WRITE setActive NOTIFY activeChanged)
     Q_PROPERTY(QString accessPointName READ accessPointName WRITE setAccessPointName NOTIFY accessPointNameChanged)
-    Q_PROPERTY(QString type READ type WRITE setType NOTIFY nameChanged)
+    Q_PROPERTY(QString type READ type WRITE setType NOTIFY typeChanged)
     Q_PROPERTY(QString username READ username WRITE setUsername NOTIFY usernameChanged)
     Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY passwordChanged)
     Q_PROPERTY(QString protocol READ protocol WRITE setProtocol NOTIFY protocolChanged)
@@ -83,7 +80,6 @@ public:
     QVariantMap IPv6Settings() const;
 
     bool isValid() const;
-
     QString modemPath() const;
 
     Q_INVOKABLE bool validateProvisioning(); //check provision against mbpi
@@ -109,25 +105,15 @@ Q_SIGNALS:
     void messageCenterChanged(const QString &msc);
     void settingsChanged(const QVariantMap &settingsMap);
     void IPv6SettingsChanged(const QVariantMap &ipv6SettingsMap);
-
     void contextPathChanged(const QString &contextPath);
-
-    void reportError(const QString &errorString);
-    void setPropertyFinished();
     void provisioningFinished();
     void modemPathChanged(const QString &path);
 
-
 protected:
-    void setOneProperty(const QString &prop,const QDBusVariant &var);
-protected slots:
-    void setPropertyFinished(QDBusPendingCallWatcher *watch);
-
-private slots:
-    void propertyChanged(const QString &property,const QDBusVariant &value);
-
-private:
-    QOfonoConnectionContextPrivate *d_ptr;
+    QDBusAbstractInterface *createDbusInterface(const QString &path);
+    QVariant convertProperty(const QString &key, const QVariant &value);
+    void propertyChanged(const QString &key, const QVariant &value);
+    void objectPathChanged(const QString &path, const QVariantMap *properties);
 };
 
 #endif // QOFONOCONNECTIONCONTEXT_H

@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013 Jolla Ltd.
+** Copyright (C) 2013-2014 Jolla Ltd.
 ** Contact: lorn.potter@jollamobile.com
 **
 ** GNU Lesser General Public License Usage
@@ -16,105 +16,71 @@
 #include <QtXmlPatterns/QXmlQuery>
 
 #include "qofonoconnectioncontext.h"
+#include "qofononetworkregistration.h"
 #include "dbus/ofonoconnectioncontext.h"
 
-#include "qofonomanager.h"
-#include "qofonoconnectionmanager.h"
-#include "qofononetworkregistration.h"
-
-class QOfonoConnectionContextPrivate
-{
-public:
-    QOfonoConnectionContextPrivate();
-    OfonoConnectionContext *context;
-    QString contextPath;
-    QVariantMap properties;
-    QString modemPath;
-
-};
-
-QOfonoConnectionContextPrivate::QOfonoConnectionContextPrivate() :
-    context(0)
-  , contextPath(QString())
-{
-}
+#define SUPER QOfonoObject
 
 QOfonoConnectionContext::QOfonoConnectionContext(QObject *parent) :
-    QObject(parent),
-    d_ptr(new QOfonoConnectionContextPrivate)
+    SUPER(parent)
 {
 }
 
 QOfonoConnectionContext::~QOfonoConnectionContext()
 {
-    delete d_ptr;
 }
 
+QDBusAbstractInterface *QOfonoConnectionContext::createDbusInterface(const QString &path)
+{
+    return new OfonoConnectionContext("org.ofono", path, QDBusConnection::systemBus(),this);
+}
+
+void QOfonoConnectionContext::objectPathChanged(const QString &path, const QVariantMap *properties)
+{
+    SUPER::objectPathChanged(path, properties);
+    Q_EMIT contextPathChanged(path);
+}
 
 QString QOfonoConnectionContext::contextPath() const
 {
-    return d_ptr->contextPath;
+    return objectPath();
 }
 
 QString QOfonoConnectionContext::modemPath() const
 {
-    return d_ptr->modemPath;
+    QString path = objectPath();
+    int lastSlash = path.lastIndexOf('/');
+    return (lastSlash > 0) ? path.left(lastSlash) : QString();
 }
 
-void QOfonoConnectionContext::setContextPath(const QString &idPath)
+void QOfonoConnectionContext::setContextPath(const QString &path)
 {
-
-    if (idPath != contextPath()) {
-        if(d_ptr->context) {
-            delete d_ptr->context;
-            d_ptr->context = 0;
-            d_ptr->properties.clear();
+    if (path != objectPath()) {
+        // Modem path is redundant but supported for historical reasons
+        QString oldModemPath(modemPath());
+        setObjectPath(path);
+        QString newModemPath(modemPath());
+        if (oldModemPath != newModemPath) {
+            Q_EMIT modemPathChanged(newModemPath);
         }
-
-        d_ptr->context = new OfonoConnectionContext("org.ofono", idPath, QDBusConnection::systemBus(),this);
-        if (d_ptr->context->isValid()) {
-            d_ptr->contextPath = idPath;
-            connect(d_ptr->context,SIGNAL(PropertyChanged(QString,QDBusVariant)),
-                    this,SLOT(propertyChanged(QString,QDBusVariant)));
-            QDBusPendingReply<QVariantMap> reply;
-            reply = d_ptr->context->GetProperties();
-            reply.waitForFinished();
-            if (reply.isError())
-                Q_EMIT reportError(reply.error().message());
-
-            d_ptr->properties = reply.value();
-           Q_EMIT contextPathChanged(idPath);
-
-        } else {
-            Q_EMIT reportError("Context is not valid");
-            qDebug() << Q_FUNC_INFO << "error Context is not valid";
-        }
-        QOfonoManager manager;
-        if (manager.modems().count() > 0) {
-            QOfonoConnectionManager connManager;
-            Q_FOREACH (const QString &path, manager.modems()) {
-                connManager.setModemPath(path);
-                if (connManager.contexts().contains(idPath)) {
-                    d_ptr->modemPath = path;
-                    Q_EMIT modemPathChanged(path);
-                    break;
-                }
-            }
-        }
-/*        if (!validateProvisioning()) {
-            provisionForCurrentNetwork(this->type());
-        } else {
-            Q_EMIT reportError("Context provision is not valid");
-            qDebug() << Q_FUNC_INFO << "error Context provision is not valid";
-        }
-*/
     }
 }
 
-void QOfonoConnectionContext::propertyChanged(const QString &property, const QDBusVariant &dbusvalue)
+QVariant QOfonoConnectionContext::convertProperty(const QString &key, const QVariant &value)
 {
-    QVariant value = dbusvalue.variant();
-    d_ptr->properties.insert(property, value);
+    if (key == QLatin1String("Settings") ||
+        key == QLatin1String("IPv6.Settings")) {
+        QVariantMap map;
+        value.value<QDBusArgument>() >> map;
+        return map;
+    } else {
+        return SUPER::convertProperty(key, value);
+    }
+}
+
+void QOfonoConnectionContext::propertyChanged(const QString &property, const QVariant &value)
+{
+    SUPER::propertyChanged(property, value);
     if (property == QLatin1String("Active")) {
         Q_EMIT activeChanged(value.value<bool>());
     } else if (property == QLatin1String("Name")) {
@@ -134,204 +100,125 @@ void QOfonoConnectionContext::propertyChanged(const QString &property, const QDB
     } else if (property == QLatin1String("MessageCenter")) {
         Q_EMIT messageCenterChanged(value.value<QString>());
     } else if (property == QLatin1String("Settings")) {
-        QVariantMap map;
-        value.value<QDBusArgument>()>>map;
-        Q_EMIT settingsChanged(map);
+        Q_EMIT settingsChanged(getVariantMap("Settings"));
     } else if (property == QLatin1String("IPv6.Settings")) {
-        QVariantMap map;
-        value.value<QDBusArgument>()>>map;
-        Q_EMIT IPv6SettingsChanged(map);
+        Q_EMIT IPv6SettingsChanged(getVariantMap("IPv6.Settings"));
     }
 }
 
 bool QOfonoConnectionContext::active() const
 {
-    if (d_ptr->context)
-        return d_ptr->properties["Active"].value<bool>();
-    else
-        return false;
+    return getBool("Active");
 }
 
 QString QOfonoConnectionContext::accessPointName() const
 {
-    if (d_ptr->context)
-        return d_ptr->properties["AccessPointName"].value<QString>();
-    else
-        return QString();
+    return getString("AccessPointName");
 }
 
 QString QOfonoConnectionContext::type() const
 {
-    if (d_ptr->context)
-        return d_ptr->properties["Type"].value<QString>();
-    else
-        return QString();
+    return getString("Type");
 }
 
 QString QOfonoConnectionContext::username() const
 {
-    if (d_ptr->context)
-        return d_ptr->properties["Username"].value<QString>();
-    else
-        return QString();
+    return getString("Username");
 }
 
 QString QOfonoConnectionContext::password() const
 {
-    if (d_ptr->context)
-        return d_ptr->properties["Password"].value<QString>();
-    else
-        return QString();
+    return getString("Password");
 }
 
 QString QOfonoConnectionContext::protocol() const
 {
-    if (d_ptr->context)
-        return d_ptr->properties["Protocol"].value<QString>();
-    else
-        return QString();
+    return getString("Protocol");
 }
 
 QString QOfonoConnectionContext::name() const
 {
-    if (d_ptr->context)
-        return d_ptr->properties["Name"].value<QString>();
-    else
-        return QString();
+    return getString("Name");
 }
 
 QString QOfonoConnectionContext::messageProxy() const
 {
-    if (d_ptr->context)
-        return d_ptr->properties["MessageProxy"].value<QString>();
-    else
-        return QString();
+    return getString("MessageProxy");
 }
 
 QString QOfonoConnectionContext::messageCenter() const
 {
-    if  (d_ptr->context)
-        return d_ptr->properties["MessageCenter"].value<QString>();
-    else
-        return QString();
+    return getString("MessageCenter");
 }
 
 QVariantMap QOfonoConnectionContext::settings() const
 {
-    QVariantMap map;
-    if (d_ptr->context)
-        d_ptr->properties["Settings"].value<QDBusArgument>()>>map;
-
-    return map;
+    return getVariantMap("Settings");
 }
 
 QVariantMap QOfonoConnectionContext::IPv6Settings() const
 {
-    QVariantMap map;
-    if (d_ptr->context)
-        d_ptr->properties["IPv6.Settings"].value<QDBusArgument>()>>map;
-
-    return map;
+    return getVariantMap("IPv6.Settings");
 }
 
 void QOfonoConnectionContext::setActive(const bool value)
 {
     // need someway to tell ui that someone wants to disconnect
-    if (!value)
+    if (!value) {
         Q_EMIT disconnectRequested();
-    QString str("Active");
-    QDBusVariant var(value);
-    setOneProperty(str,var);
+    }
+    setProperty("Active", value);
 }
 
 void QOfonoConnectionContext::setAccessPointName(const QString &value)
 {
-    QString str("AccessPointName");
-    QDBusVariant var(value);
-    setOneProperty(str,var);
+    setProperty("AccessPointName", value);
 }
 
 void QOfonoConnectionContext::setType(const QString &value)
 {
-    QString str("Type");
-    QDBusVariant var(value);
-    setOneProperty(str,var);
+    setProperty("Type", value);
 }
 
 void QOfonoConnectionContext::setUsername(const QString &value)
 {
-    QString str("Username");
-    QDBusVariant var(value);
-    setOneProperty(str,var);
+    setProperty("Username", value);
 }
 
 void QOfonoConnectionContext::setPassword(const QString &value)
 {
-    QString str("Password");
-    QDBusVariant var(value);
-    setOneProperty(str,var);
+    setProperty("Password", value);
 }
 
 void QOfonoConnectionContext::setProtocol(const QString &value)
 {
-    QString str("Protocol");
-    QDBusVariant var(value);
-    setOneProperty(str,var);
+    setProperty("Protocol", value);
 }
 
 void QOfonoConnectionContext::setName(const QString &value)
 {
-    QString str("Name");
-    QDBusVariant var(value);
-    setOneProperty(str,var);
+    setProperty("Name", value);
 }
 
 void QOfonoConnectionContext::setMessageProxy(const QString &value)
 {
-    QString str("MessageProxy");
-    QDBusVariant var(value);
-    setOneProperty(str,var);
+    setProperty("MessageProxy", value);
 }
 
 void QOfonoConnectionContext::setMessageCenter(const QString &value)
 {
-    QString str("MessageCenter");
-    QDBusVariant var(value);
-    setOneProperty(str,var);
-}
-
-bool QOfonoConnectionContext::isValid() const
-{
-    return d_ptr->context->isValid();
-}
-
-void QOfonoConnectionContext::setOneProperty(const QString &prop, const QDBusVariant &var)
-{
-    if (d_ptr->context) {
-        QDBusPendingReply <> reply = d_ptr->context->SetProperty(prop,var);
-        QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(reply, this);
-        connect(watcher, SIGNAL(finished(QDBusPendingCallWatcher*)),
-                SLOT(setPropertyFinished(QDBusPendingCallWatcher*)));
-    }
-}
-
-void QOfonoConnectionContext::setPropertyFinished(QDBusPendingCallWatcher *watch)
-{
-    watch->deleteLater();
-    QDBusPendingReply<> reply = *watch;
-
-    if(reply.isError()) {
-        qDebug() << Q_FUNC_INFO  << reply.error().message();
-        Q_EMIT reportError(reply.error().message());
-    }
-    Q_EMIT setPropertyFinished();
-
+    setProperty("MessageCenter", value);
 }
 
 void QOfonoConnectionContext::disconnect()
 {
     Q_EMIT disconnectRequested();
-    d_ptr->context->SetProperty("Active",QDBusVariant(false)).waitForFinished();
+    setPropertySync("Active", false);
+}
+
+bool QOfonoConnectionContext::isValid() const
+{
+    return SUPER::isValid();
 }
 
 /*
@@ -346,16 +233,13 @@ void QOfonoConnectionContext::disconnect()
 //check provision against mbpi
 bool QOfonoConnectionContext::validateProvisioning()
 {
-    qDebug() << Q_FUNC_INFO << d_ptr->modemPath;
-    if (d_ptr->modemPath.isEmpty())
+    QString modem(modemPath());
+    qDebug() << modem;
+    if (modem.isEmpty())
         return false;
 
-    QString provider;
-    QString mcc;
-    QString mnc;
-
     QOfonoNetworkRegistration netReg;
-    netReg.setModemPath(d_ptr->modemPath);
+    netReg.setModemPath(modem);
     if (netReg.status() == "registered")
         return validateProvisioning(netReg.networkOperators().at(0),netReg.mcc(),netReg.mnc());
     return false;
@@ -367,7 +251,7 @@ bool QOfonoConnectionContext::validateProvisioning()
 //check provision against mbpi
 bool QOfonoConnectionContext::validateProvisioning(const QString &providerString, const QString &mcc, const QString &mnc)
 {
-    qDebug() << Q_FUNC_INFO << providerString;
+    qDebug() << providerString;
     QXmlQuery query;
     QString provider = providerString;
 
@@ -453,11 +337,12 @@ bool QOfonoConnectionContext::validateProvisioning(const QString &providerString
 
 void QOfonoConnectionContext::provisionForCurrentNetwork(const QString &type)
 {
-    if (d_ptr->modemPath.isEmpty())
+    QString modem(modemPath());
+    if (modem.isEmpty())
         return;
 
     QOfonoNetworkRegistration netReg;
-    netReg.setModemPath(d_ptr->modemPath);
+    netReg.setModemPath(modem);
 
     if (netReg.status() == "registered")
         provision(netReg.name(), netReg.mcc(),netReg.mnc(), type);
@@ -483,7 +368,7 @@ void QOfonoConnectionContext::provision(const QString &provider, const QString &
         providerStr.replace("\'", "&apos;");
     }
 
-    //provider
+    // provider
     query.setQuery("/serviceproviders/country/provider[ name =  '"+providerStr+"']/string()");
     QString providerName;
     query.evaluateTo(&providerName);
@@ -513,11 +398,9 @@ void QOfonoConnectionContext::provision(const QString &provider, const QString &
 
     Q_FOREACH( const QString &apn, accessPointNameList) {
 
-//        qDebug() << "For APN" << apn;
-
         QString queryString("/serviceproviders/country/provider[ name =  '"+providerStr+"']//gsm[ network-id[@mcc = '"+mcc+"' and @mnc = '"+mnc+"']]/apn [ @value = '"+apn+ "']/");
 
-        //type
+        // type
         query.setQuery(queryString+"usage/@type/string()");
         QString typeStr;
         query.evaluateTo(&typeStr);
@@ -530,21 +413,21 @@ void QOfonoConnectionContext::provision(const QString &provider, const QString &
             continue;
         }
 
-        //name
-            query.setQuery(queryString+"name/string()");
+        // name
+        query.setQuery(queryString+"name/string()");
         QString nameStr;
         query.evaluateTo(&nameStr);
         nameStr = nameStr.simplified();
         if (nameStr.isEmpty())
             nameStr = providerStr;
 
-        //username
+        // username
         query.setQuery(queryString+"username/string()");
         QString usernameStr;
         query.evaluateTo(&usernameStr);
         usernameStr = usernameStr.simplified();
 
-        //password
+        // password
         query.setQuery(queryString+"password/string()");
         QString passwordStr;
         query.evaluateTo(&passwordStr);
@@ -552,36 +435,25 @@ void QOfonoConnectionContext::provision(const QString &provider, const QString &
         passwordStr = passwordStr.simplified();
 
         if (!nameStr.isEmpty()) {
-             QDBusPendingReply <> reply = d_ptr->context->SetProperty("Name",QDBusVariant(nameStr));
-             reply.waitForFinished();
-             d_ptr->properties["Name"] = nameStr;
+             setPropertySync("Name", nameStr);
         }
 
         if (!type.isEmpty()) {
-            QDBusPendingReply <> reply = d_ptr->context->SetProperty("Type",QDBusVariant(type));
-            reply.waitForFinished();
-            d_ptr->properties["Type"] = type;
+            setPropertySync("Type", type);
         }
 
         if (!apn.isEmpty()) {
-            QDBusPendingReply <> reply = d_ptr->context->SetProperty("AccessPointName",QDBusVariant(apn));
-            reply.waitForFinished();
-            d_ptr->properties["AccessPointName"] = apn;
+            setPropertySync("AccessPointName", apn);
         }
 
         if (!passwordStr.isEmpty()) {
-            QDBusPendingReply <> reply = d_ptr->context->SetProperty("Password",QDBusVariant(passwordStr));
-            reply.waitForFinished();
-            d_ptr->properties["Password"] = passwordStr;
+            setPropertySync("Password", passwordStr);
         }
+
         if (!usernameStr.isEmpty()) {
-            QDBusPendingReply <> reply = d_ptr->context->SetProperty("Username",QDBusVariant(usernameStr));
-            reply.waitForFinished();
-            d_ptr->properties["Username"] = usernameStr;
+            setPropertySync("Username", usernameStr);
         }
         break;
     }
-    Q_EMIT setPropertyFinished();
     Q_EMIT provisioningFinished();
 }
-
