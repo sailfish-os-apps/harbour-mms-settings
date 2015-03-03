@@ -36,20 +36,29 @@ SOURCES += \
     qofono/qofonomodem.cpp \
     qofono/qofonomodeminterface.cpp \
     qofono/qofonoobject.cpp \
-    qofono/qofonosimmanager.cpp \
-    qofono/dbus/ofonomanager.cpp \
-    qofono/dbus/ofonomodem.cpp \
-    qofono/dbus/ofonosimmanager.cpp
+    qofono/qofonosimmanager.cpp
 
 HEADERS += \
     qofono/qofonomanager.h \
     qofono/qofonomodem.h \
     qofono/qofonomodeminterface.h \
     qofono/qofonoobject.h \
-    qofono/qofonosimmanager.h \
-    qofono/dbus/ofonomanager.h \
-    qofono/dbus/ofonomodem.h \
-    qofono/dbus/ofonosimmanager.h
+    qofono/qofonosimmanager.h
+
+DBUS_INTERFACES += ofono_manager
+ofono_manager.files = qofono/dbus/ofono_manager.xml
+ofono_manager.header_flags = -N -c OfonoManager -i dbustypes.h
+ofono_manager.source_flags = -N -c OfonoManager
+
+DBUS_INTERFACES += ofono_modem
+ofono_modem.files = qofono/dbus/ofono_modem.xml
+ofono_modem.header_flags = -N -c OfonoModem
+ofono_modem.source_flags = -N -c OfonoModem
+
+DBUS_INTERFACES += ofono_simmanager
+ofono_simmanager.files = qofono/dbus/ofono_simmanager.xml
+ofono_simmanager.header_flags = -N -c OfonoSimManager
+ofono_simmanager.source_flags = -N -c OfonoSimManager
 
 # to disable building translations every time, comment out the
 # following CONFIG line

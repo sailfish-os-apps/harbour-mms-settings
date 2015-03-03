@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2013-2014 Jolla Ltd.
+** Copyright (C) 2013-2015 Jolla Ltd.
 ** Contact: lorn.potter@jollamobile.com
 **
 ** GNU Lesser General Public License Usage
@@ -16,13 +16,23 @@
 #include <QtXmlPatterns/QXmlQuery>
 
 #include "qofonoconnectioncontext.h"
+#include "qofonoconnectionmanager.h"
 #include "qofononetworkregistration.h"
-#include "dbus/ofonoconnectioncontext.h"
+#include "ofono_connection_context_interface.h"
 
 #define SUPER QOfonoObject
 
+class QOfonoConnectionContext::Private : public SUPER::ExtData
+{
+public:
+    bool provisioning;
+    QSharedPointer<QOfonoConnectionManager> mgr;
+    Private() : provisioning(false) {}
+    ~Private() {}
+};
+
 QOfonoConnectionContext::QOfonoConnectionContext(QObject *parent) :
-    SUPER(parent)
+    SUPER(new Private, parent)
 {
 }
 
@@ -32,7 +42,7 @@ QOfonoConnectionContext::~QOfonoConnectionContext()
 
 QDBusAbstractInterface *QOfonoConnectionContext::createDbusInterface(const QString &path)
 {
-    return new OfonoConnectionContext("org.ofono", path, QDBusConnection::systemBus(),this);
+    return new OfonoConnectionContext("org.ofono", path, QDBusConnection::systemBus(), this);
 }
 
 void QOfonoConnectionContext::objectPathChanged(const QString &path, const QVariantMap *properties)
@@ -56,12 +66,37 @@ QString QOfonoConnectionContext::modemPath() const
 void QOfonoConnectionContext::setContextPath(const QString &path)
 {
     if (path != objectPath()) {
-        // Modem path is redundant but supported for historical reasons
         QString oldModemPath(modemPath());
         setObjectPath(path);
         QString newModemPath(modemPath());
         if (oldModemPath != newModemPath) {
+            Private *priv = privateData();
+            const bool wasValid = isValid();
+            if (!priv->mgr.isNull()) priv->mgr->disconnect(this);
+            priv->mgr = QOfonoConnectionManager::instance(newModemPath);
+            connect(priv->mgr.data(), SIGNAL(validChanged(bool)), SLOT(onManagerValidChanged(bool)));
             Q_EMIT modemPathChanged(newModemPath);
+            const bool valid = isValid();
+            if (wasValid != valid) {
+                Q_EMIT validChanged(valid);
+            }
+        }
+    }
+}
+
+void QOfonoConnectionContext::onManagerValidChanged(bool valid)
+{
+    if (valid) {
+        resetDbusInterface();
+    } else {
+        // setDbusInterface(NULL) won't signal validChanged() because when
+        // it first calls isValid(), it would already return false. But we
+        // know that if SUPER::isValid() is true then this object was valid
+        // before ConnectionManager got invalidated.
+        bool wasValid = SUPER::isValid();
+        setDbusInterface(NULL);
+        if (wasValid) {
+            Q_EMIT validChanged(false);
         }
     }
 }
@@ -218,7 +253,49 @@ void QOfonoConnectionContext::disconnect()
 
 bool QOfonoConnectionContext::isValid() const
 {
-    return SUPER::isValid();
+    Private *priv = privateData();
+    return !priv->mgr.isNull() && priv->mgr->isValid() && SUPER::isValid();
+}
+
+bool QOfonoConnectionContext::provisioning() const
+{
+    return privateData()->provisioning;
+}
+
+QOfonoConnectionContext::Private *QOfonoConnectionContext::privateData() const
+{
+    return (QOfonoConnectionContext::Private*)SUPER::extData();
+}
+
+bool QOfonoConnectionContext::provision()
+{
+    Private *priv = privateData();
+    if (!priv->provisioning) {
+        OfonoConnectionContext *iface = (OfonoConnectionContext*)dbusInterface();
+        if (iface) {
+            priv->provisioning = true;
+            Q_EMIT provisioningChanged(true);
+            connect(new QDBusPendingCallWatcher(iface->ProvisionContext(), iface),
+                SIGNAL(finished(QDBusPendingCallWatcher*)),
+                SLOT(onProvisionContextFinished(QDBusPendingCallWatcher*)));
+            return true;
+        }
+    }
+    return false;
+}
+
+void QOfonoConnectionContext::onProvisionContextFinished(QDBusPendingCallWatcher *watch)
+{
+    watch->deleteLater();
+    QDBusPendingReply<> reply(*watch);
+    QString error;
+    if (reply.isError()) {
+        qWarning() << "Provisioning failed:" << reply.error();
+        error = reply.error().name();
+    }
+    privateData()->provisioning = false;
+    Q_EMIT provisioningChanged(false);
+    Q_EMIT provisioningFinished(error);
 }
 
 /*
@@ -240,6 +317,7 @@ bool QOfonoConnectionContext::validateProvisioning()
 
     QOfonoNetworkRegistration netReg;
     netReg.setModemPath(modem);
+    // This won't work because ofono queries are asynchronous:
     if (netReg.status() == "registered")
         return validateProvisioning(netReg.networkOperators().at(0),netReg.mcc(),netReg.mnc());
     return false;
@@ -455,5 +533,4 @@ void QOfonoConnectionContext::provision(const QString &provider, const QString &
         }
         break;
     }
-    Q_EMIT provisioningFinished();
 }
