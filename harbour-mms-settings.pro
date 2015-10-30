@@ -16,9 +16,6 @@ HEADERS += \
     src/ConfigDebug.h \
     src/ConfigValue.h
 
-INCLUDEPATH += \
-    qofono
-
 OTHER_FILES += \
     qml/main.qml \
     qml/cover/*.qml \
@@ -30,33 +27,38 @@ OTHER_FILES += \
     harbour-mms-settings.desktop
 
 # qofono
+QOFONO_SRC=qofono/src
+QOFONO_DBUS=$$QOFONO_SRC/dbus
+
+INCLUDEPATH += $$QOFONO_SRC
+
 SOURCES += \
-    qofono/qofonodbustypes.cpp \
-    qofono/qofonomanager.cpp \
-    qofono/qofonomodem.cpp \
-    qofono/qofonomodeminterface.cpp \
-    qofono/qofonoobject.cpp \
-    qofono/qofonosimmanager.cpp
+    $$QOFONO_SRC/qofonodbustypes.cpp \
+    $$QOFONO_SRC/qofonomanager.cpp \
+    $$QOFONO_SRC/qofonomodem.cpp \
+    $$QOFONO_SRC/qofonomodeminterface.cpp \
+    $$QOFONO_SRC/qofonoobject.cpp \
+    $$QOFONO_SRC/qofonosimmanager.cpp
 
 HEADERS += \
-    qofono/qofonomanager.h \
-    qofono/qofonomodem.h \
-    qofono/qofonomodeminterface.h \
-    qofono/qofonoobject.h \
-    qofono/qofonosimmanager.h
+    $$QOFONO_SRC/qofonomanager.h \
+    $$QOFONO_SRC/qofonomodem.h \
+    $$QOFONO_SRC/qofonomodeminterface.h \
+    $$QOFONO_SRC/qofonoobject.h \
+    $$QOFONO_SRC/qofonosimmanager.h
 
 DBUS_INTERFACES += ofono_manager
-ofono_manager.files = qofono/dbus/ofono_manager.xml
+ofono_manager.files = $$QOFONO_DBUS/ofono_manager.xml
 ofono_manager.header_flags = -N -c OfonoManager -i dbustypes.h
 ofono_manager.source_flags = -N -c OfonoManager
 
 DBUS_INTERFACES += ofono_modem
-ofono_modem.files = qofono/dbus/ofono_modem.xml
+ofono_modem.files = $$QOFONO_DBUS/ofono_modem.xml
 ofono_modem.header_flags = -N -c OfonoModem
 ofono_modem.source_flags = -N -c OfonoModem
 
 DBUS_INTERFACES += ofono_simmanager
-ofono_simmanager.files = qofono/dbus/ofono_simmanager.xml
+ofono_simmanager.files = $$QOFONO_DBUS/ofono_simmanager.xml
 ofono_simmanager.header_flags = -N -c OfonoSimManager
 ofono_simmanager.source_flags = -N -c OfonoSimManager
 

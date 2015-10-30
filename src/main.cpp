@@ -1,7 +1,6 @@
 /*
-  Copyright (C) 2014 Jolla Ltd.
+  Copyright (C) 2014-2015 Jolla Ltd.
   Contact: Slava Monich <slava.monich@jolla.com>
-  All rights reserved.
 
   You may use this file under the terms of BSD license as follows:
 
@@ -35,8 +34,8 @@
 #include "ConfigDebug.h"
 #include "ConfigValue.h"
 #include "MmsEngine.h"
-#include "qofono/qofonomanager.h"
-#include "qofono/qofonosimmanager.h"
+#include "qofonomanager.h"
+#include "qofonosimmanager.h"
 
 #define PLUGIN_PREFIX "harbour.mms.settings"
 
