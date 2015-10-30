@@ -32,7 +32,7 @@ Advanced MMS settings for SailfishOS
 %setup -q -n %{name}-%{version}
 
 %build
-%qtc_qmake5 
+%qtc_qmake5
 %qtc_make %{?_smp_mflags}
 
 %install
