@@ -23,6 +23,16 @@ class QOfonoObject : public QObject
     Q_OBJECT
     Q_PROPERTY(bool valid READ isValid NOTIFY validChanged)
 
+protected:
+    friend class ValidTracker;
+    class ValidTracker {
+    private:
+        QOfonoObject* object;
+    public:
+        ValidTracker(QOfonoObject* object);
+        ~ValidTracker();
+    };
+
 public:
     class ExtData {
     public:
@@ -60,6 +70,7 @@ protected:
     void setProperty(const QString &key, const QVariant &value);
     bool setPropertySync(const QString &key, const QVariant &value);
 
+    void removeProperty(const QString &key);
     QVariantMap getProperties() const;
     QVariant getProperty(const QString &key) const;
     QString getString(const QString &key) const;
