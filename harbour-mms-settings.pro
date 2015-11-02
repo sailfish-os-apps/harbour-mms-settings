@@ -20,7 +20,7 @@ OTHER_FILES += \
     qml/main.qml \
     qml/cover/*.qml \
     qml/pages/*.qml \
-    qml/cover/*.png \
+    qml/cover/*.svg \
     rpm/harbour-mms-settings.changes \
     rpm/harbour-mms-settings.spec \
     translations/*.ts \

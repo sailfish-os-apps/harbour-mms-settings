@@ -38,8 +38,12 @@ CoverBackground {
         spacing: cover.height / 10
         anchors.centerIn: parent
         Image {
+            width: Math.ceil(cover.width*2/5)
             anchors.horizontalCenter: parent.horizontalCenter
-            source: Qt.resolvedUrl("cover-image.png")
+            source: Qt.resolvedUrl("cover-image.svg")
+            sourceSize.width: width
+            sourceSize.height: height
+            fillMode: Image.PreserveAspectFit
         }
         Label {
             anchors.horizontalCenter: parent.horizontalCenter
