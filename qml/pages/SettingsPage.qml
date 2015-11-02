@@ -30,7 +30,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import harbour.mms.settings.qofono 1.0
+import harbour.mms.settings.ofono 1.0
 import harbour.mms.settings.config 1.0
 
 Page {
@@ -113,84 +113,64 @@ Page {
     ]
 
     property var engine
-    property bool simAvailable: simManager.present && simManager.subscriberIdentity
+    property bool simAvailable: simModel.count > 0
     property bool startAnimationPlaying: startTimer.running || !engine || !engine.available
 
-    OfonoManager { id: ofonoManager }
+    OfonoSimListModel {
+        id: simModel
+        onSimAdded: if (engine) engine.migrateSettings(sim.subscriberIdentity)
+        onCountChanged: if (startTimer.running) startTimer.restart()
+    }
 
-    OfonoSimManager {
-        id: simManager
-        modemPath: ofonoManager.defaultModem
-        onSubscriberIdentityChanged: if (subscriberIdentity && engine) engine.migrateSettings(subscriberIdentity)
+    Column {
+        anchors.centerIn: parent
+        spacing: Theme.paddingLarge
+        opacity: startAnimationPlaying ? 1.0 : 0.0
+        visible: opacity > 0
+        Behavior on opacity { FadeAnimation { } }
+        Text {
+            id: pleaseWait
+            anchors.horizontalCenter: parent.horizontalCenter
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.Wrap
+            font {
+                pixelSize: Theme.fontSizeExtraLarge
+                family: Theme.fontFamilyHeading
+            }
+            color: Theme.highlightColor
+            opacity: 0.6
+            text: qsTr("please-wait-splash")
+        }
+        BusyIndicator {
+            id: busyIndicator
+            anchors.horizontalCenter: parent.horizontalCenter
+            size: BusyIndicatorSize.Large
+            running: parent.visible
+        }
     }
 
     SilicaFlickable {
         anchors.fill: parent
-        contentHeight: startAnimationPlaying ? splashScreen.height : content.height
 
         VerticalScrollDecorator { }
 
         ViewPlaceholder {
             id: placeholder
-            enabled: false
             opacity: enabled ? 1.0 : 0.0
-
             Behavior on opacity { FadeAnimation { } }
-
-            states: [
-                State {
-                    name: "error"
-                    PropertyChanges { target: placeholder; enabled: true }
-                },
-                State {
-                    name: "NoSim"
-                    extend: "error"
-                    when: !simAvailable
-
-                    PropertyChanges {
-                        target: placeholder
-                        text: qsTr("no-sim-card-placeholder")
-                    }
-                }
-            ]
+            text: qsTr("no-sim-card-placeholder")
+            enabled: !simAvailable && !startAnimationPlaying
         }
 
-        Column {
-            id: splashScreen
-            visible: startAnimationPlaying && simAvailable
-            x: (page.width - childrenRect.width)/2
-            y: (page.height - busyIndicator.height)/2 - pleaseWait.height - spacing
-            spacing: Theme.paddingLarge
-            Text {
-                id: pleaseWait
-                anchors.horizontalCenter: parent.horizontalCenter
-                horizontalAlignment: Text.AlignHCenter
-                wrapMode: Text.Wrap
-                font {
-                    pixelSize: Theme.fontSizeExtraLarge
-                    family: Theme.fontFamilyHeading
-                }
-                color: Theme.highlightColor
-                opacity: 0.6
-                text: qsTr("please-wait-splash")
-            }
-            BusyIndicator {
-                id: busyIndicator
-                anchors.horizontalCenter: parent.horizontalCenter
-                size: BusyIndicatorSize.Large
-                running: parent.visible
-            }
-        }
+        SilicaListView {
+            id: list
+            anchors.fill: parent
+            model: simModel
+            opacity: (simAvailable && !startAnimationPlaying > 0) ? 1 : 0
+            visible: opacity > 0
+            Behavior on opacity { FadeAnimation {} }
 
-        Column {
-            id: content
-            visible: !startAnimationPlaying
-            enabled: placeholder.state === ""
-            opacity: enabled ? 1 : 0
-            width: parent.width
-            spacing: Theme.paddingLarge
-
-            PageHeader {
+            header: PageHeader {
                 title: qsTr("mms-settings-header")
                 Image {
                     anchors {
@@ -202,56 +182,70 @@ Page {
                 }
             }
 
-            ValueEditor {
-                predefined: userAgentOptions
-                imsi: simManager.subscriberIdentity
-                engine: page.engine
-                key: "user-agent"
-                label: qsTr("user-agent-label")
-            }
+            delegate: Column {
+                width: parent.width
+                enabled: model.subscriberIdentity !== ""
+                spacing: Theme.paddingLarge
 
-            ValueEditor {
-                predefined: userAgentProfileOptions
-                imsi: simManager.subscriberIdentity
-                engine: page.engine
-                key: "user-agent-profile"
-                label: qsTr("user-agent-profile-label")
-            }
+                SimSeparator {
+                    x: valueEditor.margin
+                    width: parent.width - 2*x
+                    text: "SIM" + (model.index + 1)
+                    visible: simModel.count > 1
+                }
 
-            ValueEditor {
-                predefined: maxMessageSizeOptions
-                imsi: simManager.subscriberIdentity
-                engine: page.engine
-                key: "max-message-size"
-                label: qsTr("max-message-size-label")
-                placeholderText: qsTr("max-message-size-placeholder")
-                customTextLabel: qsTr("max-message-size-custom-units")
-                inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhDigitsOnly
-                formatter: QtObject {
-                    function format(size) {
-                        if ((size % 1048576) === 0) {
-                            return qsTr("max-message-size-format-MB").arg(size/1048576)
-                        } else if ((size % 1024) === 0) {
-                            return qsTr("max-message-size-format-kB").arg(size/1024)
-                        } else {
-                            return size;
+                ValueEditor {
+                    id: valueEditor
+                    predefined: userAgentOptions
+                    imsi: model.subscriberIdentity
+                    engine: page.engine
+                    key: "user-agent"
+                    label: qsTr("user-agent-label")
+                }
+
+                ValueEditor {
+                    predefined: userAgentProfileOptions
+                    imsi: model.subscriberIdentity
+                    engine: page.engine
+                    key: "user-agent-profile"
+                    label: qsTr("user-agent-profile-label")
+                }
+
+                ValueEditor {
+                    predefined: maxMessageSizeOptions
+                    imsi: model.subscriberIdentity
+                    engine: page.engine
+                    key: "max-message-size"
+                    label: qsTr("max-message-size-label")
+                    placeholderText: qsTr("max-message-size-placeholder")
+                    customTextLabel: qsTr("max-message-size-custom-units")
+                    inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhDigitsOnly
+                    formatter: QtObject {
+                        function format(size) {
+                            if ((size % 1048576) === 0) {
+                                return qsTr("max-message-size-format-MB").arg(size/1048576)
+                            } else if ((size % 1024) === 0) {
+                                return qsTr("max-message-size-format-kB").arg(size/1024)
+                            } else {
+                                return size;
+                            }
                         }
                     }
                 }
-            }
 
-            ValueEditor {
-                predefined: maxPixelsOptions
-                imsi: simManager.subscriberIdentity
-                engine: page.engine
-                key: "max-pixels"
-                label: qsTr("max-pixels-label")
-                placeholderText: qsTr("max-pixels-placeholder")
-                customTextLabel: qsTr("max-pixels-custom-units")
-                inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhDigitsOnly
-                formatter: QtObject {
-                    function format(size) {
-                        return qsTr("max-pixels-format").arg(size);
+                ValueEditor {
+                    predefined: maxPixelsOptions
+                    imsi: model.subscriberIdentity
+                    engine: page.engine
+                    key: "max-pixels"
+                    label: qsTr("max-pixels-label")
+                    placeholderText: qsTr("max-pixels-placeholder")
+                    customTextLabel: qsTr("max-pixels-custom-units")
+                    inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhDigitsOnly
+                    formatter: QtObject {
+                        function format(size) {
+                            return qsTr("max-pixels-format").arg(size);
+                        }
                     }
                 }
             }

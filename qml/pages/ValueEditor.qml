@@ -47,6 +47,7 @@ Column {
     property alias customTextLabel: customText.label
     property alias placeholderText: customText.placeholderText
     property alias inputMethodHints: customText.inputMethodHints
+    property alias margin: comboBox.labelMargin
     property var formatter
     visible: configValue.defaultValue !== undefined
 

@@ -28,9 +28,10 @@ OTHER_FILES += \
 
 # qofono
 QOFONO_SRC=qofono/src
+QOFONO_PLUGIN=qofono/plugin
 QOFONO_DBUS=$$QOFONO_SRC/dbus
 
-INCLUDEPATH += $$QOFONO_SRC
+INCLUDEPATH += $$QOFONO_SRC $$QOFONO_PLUGIN
 
 SOURCES += \
     $$QOFONO_SRC/qofonodbustypes.cpp \
@@ -38,14 +39,18 @@ SOURCES += \
     $$QOFONO_SRC/qofonomodem.cpp \
     $$QOFONO_SRC/qofonomodeminterface.cpp \
     $$QOFONO_SRC/qofonoobject.cpp \
-    $$QOFONO_SRC/qofonosimmanager.cpp
+    $$QOFONO_SRC/qofonosimmanager.cpp \
+    $$QOFONO_SRC/qofonosimwatcher.cpp \
+    $$QOFONO_PLUGIN/qofonosimlistmodel.cpp
 
 HEADERS += \
     $$QOFONO_SRC/qofonomanager.h \
     $$QOFONO_SRC/qofonomodem.h \
     $$QOFONO_SRC/qofonomodeminterface.h \
     $$QOFONO_SRC/qofonoobject.h \
-    $$QOFONO_SRC/qofonosimmanager.h
+    $$QOFONO_SRC/qofonosimmanager.h \
+    $$QOFONO_SRC/qofonosimwatcher.h \
+    $$QOFONO_PLUGIN/qofonosimlistmodel.h
 
 DBUS_INTERFACES += ofono_manager
 ofono_manager.files = $$QOFONO_DBUS/ofono_manager.xml

@@ -36,6 +36,7 @@
 #include "MmsEngine.h"
 #include "qofonomanager.h"
 #include "qofonosimmanager.h"
+#include "qofonosimlistmodel.h"
 
 #define PLUGIN_PREFIX "harbour.mms.settings"
 
@@ -43,6 +44,7 @@ void registerOfonoTypes(const char* uri, int v1 = 1, int v2 = 0)
 {
     qmlRegisterType<QOfonoManager>(uri, v1, v2, "OfonoManager");
     qmlRegisterType<QOfonoSimManager>(uri, v1, v2, "OfonoSimManager");
+    qmlRegisterType<QOfonoSimListModel>(uri, v1, v2, "OfonoSimListModel");
 }
 
 void registerConfigTypes(const char* uri, int v1 = 1, int v2 = 0)
@@ -68,7 +70,7 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
         delete translator;
     }
 
-    registerOfonoTypes(PLUGIN_PREFIX ".qofono");
+    registerOfonoTypes(PLUGIN_PREFIX ".ofono");
     registerConfigTypes(PLUGIN_PREFIX ".config");
 
     QQuickView *view = SailfishApp::createView();
