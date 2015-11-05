@@ -5,6 +5,7 @@ Release:    1
 Group:      Applications/System
 License:    BSD
 URL:        https://github.com/monich/harbour-mms-settings
+Vendor:     meego
 Source0:    %{name}-%{version}.tar.bz2
 
 Requires:      sailfishsilica-qt5 >= 0.10.9
