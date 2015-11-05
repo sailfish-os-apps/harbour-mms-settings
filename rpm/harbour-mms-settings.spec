@@ -1,6 +1,6 @@
 Name:       harbour-mms-settings
 Summary:    Advanced MMS settings
-Version:    1.0.7
+Version:    1.0.9
 Release:    1
 Group:      Applications/System
 License:    BSD
