@@ -187,9 +187,7 @@ Page {
                 enabled: model.subscriberIdentity !== ""
                 spacing: Theme.paddingLarge
 
-                SimSeparator {
-                    x: valueEditor.margin
-                    width: parent.width - 2*x
+                SectionHeader {
                     text: "SIM" + (model.index + 1)
                     visible: simModel.count > 1
                 }
